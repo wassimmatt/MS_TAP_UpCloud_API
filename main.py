@@ -7,6 +7,8 @@ import http.client
 import base64
 import upcloud_api
 from upcloud_api import Server, Storage, Tag, login_user_block
+
+
 # from upcloud_api.storage import BackupDeletionPolicy
 
 
@@ -15,8 +17,6 @@ class Upcloud_api:
         self.manager = upcloud_api.CloudManager('tapaug2021ee', 'gr4D334uG2021')
         self.manager.authenticate()
         self.tag = Tag('JWM_TEAM')
-
-
 
     def logon_user(self):
         login_user = login_user_block(
@@ -28,14 +28,12 @@ class Upcloud_api:
 
     # describe all plan here (hard code)
     # def get_plan(self):
-        # self.PlanClass = upcloud_api.listPlans()
-        # PlanClass.
+    # self.PlanClass = upcloud_api.listPlans()
+    # PlanClass.
 
+    # return storage_size, storage_tire
 
-        # return storage_size, storage_tire
-
-
-    def create_server(self, plan, zone, hostname, login_user):
+    def create_server(self, plan, zone, hostname, os, os_size):
         server = Server(
             plan=plan,
             hostname=hostname,
@@ -44,43 +42,51 @@ class Upcloud_api:
                 # OS: template storage UUID, all available os templates can be retrieved by calling manager.get_templates()
                 # Note: the storage os template uuid:s will change when OS is updated. So check that the UUID is correct
                 # default tier: maxIOPS, the 100k IOPS storage backend
-                Storage(os='01000000-0000-4000-8000-000030200200', size=10),
+                Storage(os=os, size=os_size),
                 # secondary storage, hdd for reduced speed & cost
-                Storage(size=100, tier='hdd')
+                # Storage(size=100, tier='hdd')
             ],
-            login_user=login_user  # user and ssh-keys
+            # login_user=login_user  # user and ssh-keys
         )
         self.manager.create_server(server)
         # server.add_tags([self.tag])
         return server
 
+    # get all server list
+    def server_list(self):
+        servers = self.manager.get_servers()
+        server_list = []
+        for server in servers:
+            server_list.append(server.to_dict())
+        return server_list
 
-    #delete a vm based on the uuid
-    def rm_server(self,uuid):
+    # get one server details
+    def single_server(self, uuid):
+        server = self.manager.get_server(uuid).to_dict()
+        return server
+
+    # delete a vm based on the uuid
+    def rm_server(self, uuid):
         server = self.manager.get_server(uuid)
-        server.shutdown(hard=True)
+        if server.to_dict()["state"] != "stopped":
+            server.shutdown(hard=True)
         while self.manager.get_server(uuid).to_dict()["state"] != "stopped":
             pass
-        self.manager.delete_server(uuid, delete_storages=True)
+        self.manager.delete_server(uuid)
         return "Selected server deleted."
 
-
-ins = Upcloud_api()
-login_user=ins.logon_user()
+# ins = Upcloud_api()
+# login_user=ins.logon_user()
 # new_server=ins.server("2xCPU-4GB","uk-lon1","web1.example.com",login_user)
-ins.rm_server("0021e1da-be14-4440-8de6-f04b0650926b")
+# ins.rm_server("0021e1da-be14-4440-8de6-f04b0650926b")
 
-#get server details
+# get server details
 # print(self.manager.get_server("0021e1da-be14-4440-8de6-f04b0650926b").to_dict())
-#get server states
+# get server states
 # print(manager.get_server("0021e1da-be14-4440-8de6-f04b0650926b").to_dict()['state'])
-#delete vms (stop first)
+# delete vms (stop first)
 
-#access the console of VM
-
-
-
-
+# access the console of VM
 
 
 # @app.route('/')
