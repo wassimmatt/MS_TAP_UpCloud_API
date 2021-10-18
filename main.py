@@ -27,7 +27,7 @@ class Upcloud_api:
         return login_user
 
     # describe all plan here (hard code)
-    def get_plan(self):
+    # def get_plan(self):
         # self.PlanClass = upcloud_api.listPlans()
         # PlanClass.
 
@@ -61,7 +61,7 @@ class Upcloud_api:
         server.shutdown(hard=True)
         while self.manager.get_server(uuid).to_dict()["state"] != "stopped":
             pass
-        self.manager.delete_server(uuid)
+        self.manager.delete_server(uuid, delete_storages=True)
         return "Selected server deleted."
 
 
