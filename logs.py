@@ -25,4 +25,4 @@ class vmlogs:
     def debug_logger(self,content):
         logging.debug(content)
 
-ins = vmlogs()
+# ins = vmlogs()

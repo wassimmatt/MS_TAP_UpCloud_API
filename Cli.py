@@ -1,4 +1,6 @@
 from __future__ import print_function, unicode_literals
+
+import requests
 from PyInquirer import style_from_dict, Token, prompt, Separator
 import json
 from PyInquirer import prompt, Separator
@@ -68,7 +70,7 @@ class Cli:
                 continue
             else :
                 continue
-
+        return os_st
 
 
     # TODO better to use while loop than recursion!
@@ -187,9 +189,20 @@ class Cli:
         vmDetails=self.get_vm_details()
         monitor=self.request_progress()
         vm_list=self.requestSummary( vmDetails, monitor)
-        #for vm in vm_list:
-            #reponse=requests.post('http://127.0.0.1:5000/server',json=vm)
-        #add the manager component
+        new_uuid_list = []
+        for count, vm in enumerate(vm_list):
+            print("Creating server " + str(count+1) + "/" + str(len(vm_list)))
+            response=requests.post('http://127.0.0.1:5000/server', json=json.dumps(vm))
+            new_uuid_list.append(response.json()['uuid'])
+        count = 1
+        if monitor == 'YES':
+            while new_uuid_list:
+                for uuid in new_uuid_list:
+                    status = self.manager.server_status(uuid)
+                    if status != 'maintenance':
+                        print("Server " + str(count) + "/" + str(len(vm_list)) + ": " + status)
+                        count += 1
+                        new_uuid_list.remove(uuid)
 
     def performe_deleteVm(self):
         uuid=self.get_delete_choice()
@@ -232,10 +245,9 @@ class Cli:
             thisdict = {
                 "hostname": i[0],
                 "zone": i[1],
-                "plan": i[2],
-                "os": i[3],
-                "os_size":i[4]
-
+                "plan": i[3],
+                "os": i[2],
+                "size":i[4]
             }
 
             summary.append(thisdict)
@@ -244,7 +256,7 @@ class Cli:
         print(summary)
         print("\n\n\n")
         print("MONITORING CHOICE: ",monitor,"\n\n\n")
-
+        return summary
     #
     #
     # def vm_name_input(self):

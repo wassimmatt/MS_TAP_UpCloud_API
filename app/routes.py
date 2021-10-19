@@ -1,3 +1,5 @@
+import json
+
 from app import app
 from Upcloud_API import Upcloud_API
 from flask import request, jsonify
@@ -28,13 +30,14 @@ sample_start_server = [
 def create_server():
     json_data = request.get_json()
     print(json_data)
-    login_user = api.key_pair_login()
-    new_servers = []
-    for server in json_data:
-        server = api.create_server(server['plan'], server['zone'], server['hostname'], server['os'], server['size'],
-                                   login_user)
-        new_servers.append(server.to_dict())
-    return jsonify(new_servers)
+    server = json.loads(json_data)
+    new_server = api.create_server(server['plan'], server['zone'], server['hostname'], server['os'], int(server['size']))
+    new_server_dict = new_server.to_dict()
+    return jsonify({
+        "state": new_server_dict['state'],
+        "hostname": new_server_dict['hostname'],
+        "uuid": new_server_dict['uuid']
+    })
 
 
 @app.route('/server', methods=['GET'])
