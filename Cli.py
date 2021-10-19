@@ -1,186 +1,169 @@
-from __future__ import print_function, unicode_literals
-from PyInquirer import style_from_dict, Token, prompt, Separator
-import json
-from PyInquirer import prompt, Separator
-import requests
+import upcloud_api
+from upcloud_api import Server, Storage, Tag, login_user_block
+import paramiko
+# from upcloud_api.storage import BackupDeletionPolicy
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
 
-style = style_from_dict({
-    Token.Separator: '#cc5454',
-    Token.QuestionMark: '#673ab7 bold',
-    Token.Selected: '#cc5454',  # default
-    Token.Pointer: '#673ab7 bold',
-    Token.Instruction: '',  # default
-    Token.Answer: '#f44336 bold',
-    Token.Question: '',
-})
-
-
-class Cli:
-    # def __init__(self):
-    #     self.manager = Upcloud_api()
-
-    def ask_action(self):
-        directions_prompt = {
-            'type': 'list',
-            'name': 'action',
-            'message': 'Which action would you like to perform?',
-            'choices': ['CreateVM', 'CheckVmStatus', 'DeleteVm', 'VmConsole', 'PerformanceStat', 'VmEvents']
-        }
-        answers = prompt(directions_prompt)
-        return answers['action']
-
-    def ask_zone(self):
-        directions_prompt = {
-            'type': 'list',
-            'name': 'zone',
-            'message': 'Which zone would you like to choose?',
-            'choices': ['z1', 'z2', 'z3', 'z4', 'z5', 'z6']
-        }
-        answers = prompt(directions_prompt)
-        return answers['zone']
-
-    def ask_plan(self):
-        directions_prompt = {
-            'type': 'list',
-            'name': 'plan',
-            'message': 'Which plan would you like to choose?',
-            'choices': ['p1', 'p2', 'p3', 'p4', 'p5', 'p6']
-        }
-        answers = prompt(directions_prompt)
-        return answers['plan']
-
-    def ask_os(self):
-        directions_prompt = {
-            'type': 'list',
-            'name': 'os',
-            'message': 'Which os would you like to choose?',
-            'choices': ['o1', 'o2', 'o3', 'o4', 'o5', 'o6']
-        }
-        answers = prompt(directions_prompt)
-        return answers['os']
-
-    # TODO better to use while loop than recursion!
-
-    def main(self):
-        print('You find yourself in a small room, there is a door in front of you.')
-        # exit_house()
-        # action()
-
-    def request_progress(self):
-        directions_prompt = {
-            'type': 'list',
-            'name': 'request_prog',
-            'message': '  would you like to monitor the progress of your request?',
-            'choices': ['YES', 'NO']
-        }
-        answers = prompt(directions_prompt)
-        return answers['request_prog']
-
-    def get_vm_details(self):
-        vmDetails = []
-        VmNumber = self.vm_number_input()
-        for i in range(0, VmNumber):
-            vmName = self.vm_name_input()
-            zone = self.ask_zone()
-            plan = self.ask_plan()
-            os = self.ask_os()
-            vmDetails.append([vmName, zone, os, plan])
-        return vmDetails
-
-    def performe_CreateVM(self):
-        vmDetails = self.get_vm_details()
-        monitor = self.request_progress()
-        vm_list = self.requestSummary(vmDetails, monitor)
-        response = requests.post('http://127.0.0.1:5000/server', json=vm_list)
-        print(response)
-
-    def action(self):
-        action = self.ask_action()
-        if (action == 'CreateVM'):
-            self.performe_CreateVM()
-        elif (action == 'CheckVmStatus'):
-            print('CheckVmStatus')
-        elif (action == 'DeleteVm'):
-            print('DeleteVm')
-        elif (action == 'VmConsole'):
-            print('VmConsole')
-        elif (action == 'PerformanceStat'):
-            print('PerformanceStat')
-        elif (action == 'VmEvents'):
-            print('VmEvents')
-
-    def requestSummary(self, vmDetails, monitor):
-        print("..")
-        summary = []
-        for i in vmDetails:
-            thisdict = {
-                "hostname": i[0],
-                "zone": i[1],
-                "plan": i[2],
-                "os": i[3]
-            }
-
-            summary.append(thisdict)
-        print("=======this is your request choices summary======== \n\n\n")
-        print("VMs DETAILS \n\n\n")
-        print(summary)
-        print("\n\n\n")
-        print("MONITORING CHOICE: ", monitor, "\n\n\n")
-        return summary
-
-    def encounter2a(self):
-        direction = self.ask_action()
-        if direction == 'Forward':
-            output = 'You find a painted wooden sign that says:'
-            output += ' \n'
-            output += ' ____  _____  ____  _____ \n'
-            output += '(_  _)(  _  )(  _ \\(  _  ) \n'
-            output += '  )(   )(_)(  )(_) ))(_)(  \n'
-            output += ' (__) (_____)(____/(_____) \n'
-            print(output)
-        else:
-            print('You cannot go that way')
-            # encounter2a()
-
-    def vm_name_input(self):
-        questions = [
-            {
-                'type': 'input',
-                'name': 'vmName',
-                'message': 'What\'s your VM name',
-            }
-        ]
-        answers = prompt(questions)
-        return answers['vmName']
-
-    def vm_number_input(self):
-        questions = [
-            {
-                'type': 'input',
-                'name': 'vmNumber',
-                'message': 'how many VMs you would like to create',
-            }
-        ]
-        answers = prompt(questions)
-        return int(answers['vmNumber'])
-
-    # def encounter2b():
-    #     prompt({
-    #         'type': 'list',
-    #         'name': 'weapon',
-    #         'message': 'Pick one',
-    #         'choices': [
-    #             'Use the stick',
-    #             'Grab a large rock',
-    #             'Try and make a run for it',
-    #             'Attack the wolf unarmed'
-    #         ]
-    #     },  style=style)
-    #     print('The wolf mauls you. You die. The end.')
-
-    # if __name__ == '__main__':
-    #     main()
+class Upcloud_API:
+    def __init__(self):
+        self.manager = upcloud_api.CloudManager('tapaug2021ee', 'gr4D334uG2021')
+        self.manager.authenticate()
+        self.tag = Tag('JWM_TEAM')
+        self.plan1 = "1xCPU-2GB"
+        self.plan2 = "1xCPU-1GB"
+        self.plan3 = "2xCPU-4GB"
+        self.plan4 = "4xCPU-8GB"
+        self.plan5 = "6xCPU-16GB"
+        self.plan6 = "8xCPU-32GB"
+        self.plan7 = "12xCPU-48GB"
+        self.plan8 = "16xCPU-64GB"
+        self.plan9 = "20xCPU-96GB"
+        self.plan10 = "20xCPU-128G"
+        self.planList=[ "1xCPU-2GB","1xCPU-1GB","2xCPU-4GB","4xCPU-8GB","6xCPU-16GB","8xCPU-32GB","12xCPU-48GB","16xCPU-64GB","20xCPU-96GB","20xCPU-128G"]
+        # self.logs
 
 
-ins = Cli()
-ins.performe_CreateVM()
+    # login user
+    def key_pair_login(self):
+        private_key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=2048,
+            backend=default_backend()
+        )
+        #generate the public key
+        public_key = private_key.public_key().public_bytes(serialization.Encoding.OpenSSH, serialization.PublicFormat.OpenSSH)
+        public_key = public_key.decode(encoding='UTF-8')
+        # get private key in PEM container format
+        pem = private_key.private_bytes(encoding=serialization.Encoding.PEM,
+                                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                                encryption_algorithm=serialization.NoEncryption())
+        login_user = login_user_block(
+            username='root',
+            ssh_keys=[public_key],
+            create_password=False
+        )
+        with open('private_key.pem','wb') as f:
+            f.write(pem)
+        return login_user
+
+
+    def get_zones(self):
+        zones = self.manager.get_zones()['zones']['zone']
+        zone_list = []
+        for zone in zones:
+            zone_list.append(zone['id'])
+        return zone_list
+
+
+    def get_templates(self):
+        templates = self.manager.get_templates()
+        return templates
+
+
+    #new server creation
+    def create_server(self, plan, zone, hostname, os, os_size, login_user):
+        server = Server(
+            plan=plan,
+            hostname=hostname,
+            zone=zone,  # All available zones with ids can be retrieved by using manager.get_zones()
+            storage_devices=[
+                Storage(os=os, size=os_size),
+            ],
+            login_user=login_user  # user and ssh-keys
+        )
+        self.manager.create_server(server)
+        self.server_status(server)
+        return server
+
+
+    #get current server status
+    def server_status(self,uuid):
+        server_status = self.manager.get_server(uuid).to_dict()['state']
+        server_name = self.manager.get_server(uuid).to_dict()['hostname']
+        return "Current status of server: "+server_name+ ":"+uuid+"  is "+server_status
+
+
+    #get all server list
+    def server_list(self):
+        servers = self.manager.get_servers()
+        server_list=[]
+        for server in servers:
+            server_list.append(server.to_dict())
+        return server_list
+
+
+    #get one server details
+    def single_server(self,uuid):
+        server = self.manager.get_server(uuid).to_dict()
+        return server
+
+
+    def access_console(self,uuid):
+        try:
+            server = self.manager.get_server(uuid).to_dict()
+            ip_addr = server['ip_addresses']
+            for ip in ip_addr:
+                if ip['access'] =='public' and ip['family'] == 'IPv4':
+                    ssh = paramiko.SSHClient()
+                    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                    ssh.connect(ip['address'],port=22,username='test_user',key_filename='.\private_key.pem')
+                    command = 'uname -r '
+                    stdin, stdout, stderr = ssh.exec_command(command)
+                    lines = stdout.readlines()
+                    print(lines)
+                    break
+        except Exception as e:
+            raise e
+
+
+    # check the performance of linux server
+    def perform_statistic_linux(self,uuid):
+        try:
+            server = self.manager.get_server(uuid).to_dict()
+            ip_addr = server['ip_addresses']
+            perform_info = []
+            for ip in ip_addr:
+                if ip['access'] =='public' and ip['family'] == 'IPv4':
+                    ssh = paramiko.SSHClient()
+                    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                    ssh.connect(ip['address'],port=22,username='root',key_filename='private_key.pem')
+                    command = 'export TERM=xterm && top -n 1 -b'
+                    # command = 'export TERM=xterm && mpstat'
+                    stdin, stdout, stderr = ssh.exec_command(command)
+                    lines = stdout.readlines()
+                    err_lines = stderr.readlines()
+                    break
+            if err_lines:
+                return err_lines
+            else:
+                return lines
+        except Exception as e:
+            raise e
+
+
+    #delete a vm based on the uuid
+    def rm_server(self,uuid):
+        server = self.manager.get_server(uuid)
+        server.shutdown(hard=True)
+        while self.manager.get_server(uuid).to_dict()["state"] != "stopped":
+            pass
+        self.manager.delete_server(uuid)
+        return "Selected server deleted."
+
+
+if __name__ == '__main__':
+    ins = Upcloud_API()
+    # login_user = ins.key_pair_login()
+    # print(ins.server_list())
+    # print(ins.get_zones())
+    # print(ins.get_templates())
+    # print(ins.single_server('00effc4b-47f5-4394-a357-0750c810b096'))
+    # print(ins.access_console('00effc4b-47f5-4394-a357-0750c810b096'))
+    # print(ins.server_list())
+    print(ins.server_status('00e3d773-a32e-4cea-9653-1df3543710fa'))
+    # print(ins.perform_statistic_linux('00e3d773-a32e-4cea-9653-1df3543710fa'))
+    # print(ins.create_server("2xCPU-4GB","uk-lon1","maggie.win.com", "01000000-0000-4000-8000-000030200200", "10",login_user))
+    # ins.rm_server("0021e1da-be14-4440-8de6-f04b0650926b")
