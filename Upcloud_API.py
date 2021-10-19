@@ -1,6 +1,11 @@
 import upcloud_api
 from upcloud_api import Server, Storage, Tag, login_user_block
+import paramiko
 # from upcloud_api.storage import BackupDeletionPolicy
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
 
 class Upcloud_API:
     def __init__(self):
@@ -20,12 +25,26 @@ class Upcloud_API:
 
 
     # login user
-    def logon_user(self):
+    def key_pair_login(self):
+        private_key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=2048,
+            backend=default_backend()
+        )
+        #generate the public key
+        public_key = private_key.public_key().public_bytes(serialization.Encoding.OpenSSH, serialization.PublicFormat.OpenSSH)
+        public_key = public_key.decode(encoding='UTF-8')
+        # get private key in PEM container format
+        pem = private_key.private_bytes(encoding=serialization.Encoding.PEM,
+                                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                                encryption_algorithm=serialization.NoEncryption())
         login_user = login_user_block(
             username='test_user',
-            ssh_keys=['ssh-rsa AAAAB3NzaC1yc2EAAptshi44x user@some.host'],
+            ssh_keys=[public_key],
             create_password=False
         )
+        with open('private_key.pem','wb') as f:
+            f.write(pem)
         return login_user
 
 
@@ -38,11 +57,11 @@ class Upcloud_API:
     #     return zone_list
 
 
-    # def get_templates(self):
-    #     templates = self.manager.get_templates()
-    #     print(templates)
-    #     # template_list=[]
-    #     print(templates[0].keys())
+    def get_templates(self):
+        templates = self.manager.get_templates()
+        print(templates)
+        # # template_list=[]
+        # print(templates[0].keys())
         # i = 0
         # while i < len(templates):
         #     if os == templates[i].keys():
@@ -90,9 +109,21 @@ class Upcloud_API:
 
 
     def access_console(self,uuid):
-        server = self.manager.get_server(uuid).to_dict()
-        ip_addr = server['ip_addresses'][1]['address']
-        return ip_addr
+        try:
+            server = self.manager.get_server(uuid).to_dict()
+            ip_addr = server['ip_addresses']
+            for ip in ip_addr:
+                if ip['access'] =='public' and ip['family'] == 'IPv4':
+                    ssh = paramiko.SSHClient()
+                    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                    ssh.connect(ip['address'],port=22,username='test_user',key_filename='.\private_key.pem')
+                    command = 'uname -r '
+                    stdin, stdout, stderr = ssh.exec_command(command)
+                    lines = stdout.readlines()
+                    print(lines)
+                    break
+        except Exception as e:
+            raise e
 
 
     #delete a vm based on the uuid
@@ -104,14 +135,18 @@ class Upcloud_API:
         self.manager.delete_server(uuid)
         return "Selected server deleted."
 
+
+
 if __name__ == '__main__':
     ins = Upcloud_API()
-    login_user=ins.logon_user()
+    # login_user=ins.logon_user()
+    # login_user = ins.key_pair_login()
     # print(ins.server_list())
-    # print(ins.single_server('00061ca6-0c05-4baa-8989-3196eb943aa5'))
-    print(ins.access_console('00061ca6-0c05-4baa-8989-3196eb943aa5'))
-    # ins.server_list()
-
+    # print(ins.single_server('00effc4b-47f5-4394-a357-0750c810b096'))
+    print(ins.access_console('00effc4b-47f5-4394-a357-0750c810b096'))
+    # print(ins.server_list())
+    # ins.get_templates()
+    # ins.create_server("2xCPU-4GB","uk-lon1","maggie.example.com", "01000000-0000-4000-8000-000020060100", "10", "100", "hdd", login_user)
     # new_server=ins.server("2xCPU-4GB","uk-lon1","web1.example.com",login_user)
     # ins.rm_server("0021e1da-be14-4440-8de6-f04b0650926b")
 
