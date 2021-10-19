@@ -1,7 +1,16 @@
+import flask
+# import flask_restplus
+# import werkzeug
+
+from flask import Flask
+import http.client
+import base64
 import upcloud_api
 from upcloud_api import Server, Storage, Tag, login_user_block
-import paramiko
+
 # from upcloud_api.storage import BackupDeletionPolicy
+
+import paramiko
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -22,7 +31,6 @@ class Upcloud_API:
         self.plan8 = "16xCPU-64GB"
         self.plan9 = "20xCPU-96GB"
         self.plan10 = "20xCPU-128G"
-
 
     # login user
     def key_pair_login(self):
@@ -92,7 +100,6 @@ class Upcloud_API:
         # server.add_tags([self.tag])
         return server
 
-
     #get all server list
     def server_list(self):
         servers = self.manager.get_servers()
@@ -101,12 +108,10 @@ class Upcloud_API:
             server_list.append(server.to_dict())
         return server_list
 
-
     #get one server details
     def single_server(self,uuid):
         server = self.manager.get_server(uuid).to_dict()
         return server
-
 
     def access_console(self,uuid):
         try:
@@ -129,13 +134,12 @@ class Upcloud_API:
     #delete a vm based on the uuid
     def rm_server(self,uuid):
         server = self.manager.get_server(uuid)
-        server.shutdown(hard=True)
+        if server.to_dict()["state"] != "stopped":
+            server.shutdown(hard=True)
         while self.manager.get_server(uuid).to_dict()["state"] != "stopped":
             pass
         self.manager.delete_server(uuid)
         return "Selected server deleted."
-
-
 
 if __name__ == '__main__':
     ins = Upcloud_API()
@@ -157,10 +161,6 @@ if __name__ == '__main__':
 #delete vms (stop first)
 
 #access the console of VM
-
-
-
-
 
 
 # @app.route('/')
