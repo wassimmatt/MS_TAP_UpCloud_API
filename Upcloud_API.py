@@ -6,23 +6,25 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
+from datetime import datetime
+import logs
 
 class Upcloud_API:
     def __init__(self):
         self.manager = upcloud_api.CloudManager('tapaug2021ee', 'gr4D334uG2021')
         self.manager.authenticate()
-        self.tag = Tag('JWM_TEAM')
-        self.plan1 = "1xCPU-2GB"
-        self.plan2 = "1xCPU-1GB"
-        self.plan3 = "2xCPU-4GB"
-        self.plan4 = "4xCPU-8GB"
-        self.plan5 = "6xCPU-16GB"
-        self.plan6 = "8xCPU-32GB"
-        self.plan7 = "12xCPU-48GB"
-        self.plan8 = "16xCPU-64GB"
-        self.plan9 = "20xCPU-96GB"
-        self.plan10 = "20xCPU-128G"
-        # self.logs
+        self.myLogger = logs.vmlogs()
+        # self.plan1 = "1xCPU-2GB"
+        # self.plan2 = "1xCPU-1GB"
+        # self.plan3 = "2xCPU-4GB"
+        # self.plan4 = "4xCPU-8GB"
+        # self.plan5 = "6xCPU-16GB"
+        # self.plan6 = "8xCPU-32GB"
+        # self.plan7 = "12xCPU-48GB"
+        # self.plan8 = "16xCPU-64GB"
+        # self.plan9 = "20xCPU-96GB"
+        # self.plan10 = "20xCPU-128G"
+        self.login_user = self.key_pair_login()
 
 
     # login user
@@ -63,7 +65,7 @@ class Upcloud_API:
 
 
     #new server creation
-    def create_server(self, plan, zone, hostname, os, os_size, login_user):
+    def create_server(self, plan, zone, hostname, os, os_size):
         server = Server(
             plan=plan,
             hostname=hostname,
@@ -71,10 +73,12 @@ class Upcloud_API:
             storage_devices=[
                 Storage(os=os, size=os_size),
             ],
-            login_user=login_user  # user and ssh-keys
+            login_user=self.login_user  # user and ssh-keys
         )
-        self.manager.create_server(server)
-        self.server_status(server)
+        server = self.manager.create_server(server)
+        server_uuid = server.to_dict()['uuid']
+        server_name = server.to_dict()['hostname']
+        self.myLogger.info_logger(server_name+' with uuid: '+ server_uuid + " was created at "+ str(datetime.now()))
         return server
 
 
@@ -145,12 +149,15 @@ class Upcloud_API:
 
     #delete a vm based on the uuid
     def rm_server(self,uuid):
-        server = self.manager.get_server(uuid)
-        server.shutdown(hard=True)
-        while self.manager.get_server(uuid).to_dict()["state"] != "stopped":
-            pass
-        self.manager.delete_server(uuid)
-        return "Selected server deleted."
+        try:
+            server = self.manager.get_server(uuid)
+            server.shutdown(hard=True)
+            while self.manager.get_server(uuid).to_dict()["state"] != "stopped":
+                pass
+            self.manager.delete_server(uuid)
+            return "Selected server has been deleted."
+        except Exception as e:
+            raise e
 
 
 if __name__ == '__main__':
@@ -162,7 +169,8 @@ if __name__ == '__main__':
     # print(ins.single_server('00effc4b-47f5-4394-a357-0750c810b096'))
     # print(ins.access_console('00effc4b-47f5-4394-a357-0750c810b096'))
     # print(ins.server_list())
-    print(ins.server_status('00e3d773-a32e-4cea-9653-1df3543710fa'))
+    # print(ins.server_status('00effc4b-47f5-4394-a357-0750c810b096'))
     # print(ins.perform_statistic_linux('00e3d773-a32e-4cea-9653-1df3543710fa'))
-    # print(ins.create_server("2xCPU-4GB","uk-lon1","maggie.win.com", "01000000-0000-4000-8000-000030200200", "10",login_user))
-    # ins.rm_server("0021e1da-be14-4440-8de6-f04b0650926b")
+    print(ins.create_server("2xCPU-4GB","uk-lon1","maggie.test.com", "01000000-0000-4000-8000-000030200200", "10"))
+    # print(ins.self.logs)
+    print(ins.rm_server("00d800ce-546f-4b6b-9707-1a31f37d400a"))
