@@ -1,3 +1,8 @@
+import flask
+from flask import Flask
+import http.client
+import base64
+
 class BaseAPI:
     api = "api.upcloud.com"
     api_version = "1.3"
@@ -29,12 +34,12 @@ class plans(BaseAPI):
     endpoint="/plan"
     def do(self):
         self.get(self.endpoint)
-#
-# class server(BaseAPI):
-#     endpoint="/server"
-#
-#     def do(self):
-#         self.get(self.endpoint)
-#
-if __name__ == '__main__':
-    plans().do()
+
+class server(BaseAPI):
+    endpoint="/server"
+
+    def do(self):
+        self.get(self.endpoint)
+
+# if __name__ == '__main__':
+#     plans().do()
