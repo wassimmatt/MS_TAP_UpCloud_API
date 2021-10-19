@@ -2,7 +2,7 @@ from __future__ import print_function, unicode_literals
 from PyInquirer import style_from_dict, Token, prompt, Separator
 import json
 from PyInquirer import prompt, Separator
-
+import requests
 
 style = style_from_dict({
     Token.Separator: '#cc5454',
@@ -14,6 +14,7 @@ style = style_from_dict({
     Token.Question: '',
 })
 
+
 class Cli:
     # def __init__(self):
     #     self.manager = Upcloud_api()
@@ -23,7 +24,7 @@ class Cli:
             'type': 'list',
             'name': 'action',
             'message': 'Which action would you like to perform?',
-            'choices': ['CreateVM', 'CheckVmStatus', 'DeleteVm', 'VmConsole','PerformanceStat','VmEvents']
+            'choices': ['CreateVM', 'CheckVmStatus', 'DeleteVm', 'VmConsole', 'PerformanceStat', 'VmEvents']
         }
         answers = prompt(directions_prompt)
         return answers['action']
@@ -33,7 +34,7 @@ class Cli:
             'type': 'list',
             'name': 'zone',
             'message': 'Which zone would you like to choose?',
-            'choices': ['z1', 'z2', 'z3', 'z4','z5','z6']
+            'choices': ['z1', 'z2', 'z3', 'z4', 'z5', 'z6']
         }
         answers = prompt(directions_prompt)
         return answers['zone']
@@ -43,7 +44,7 @@ class Cli:
             'type': 'list',
             'name': 'plan',
             'message': 'Which plan would you like to choose?',
-            'choices': ['p1', 'p2', 'p3', 'p4','p5','p6']
+            'choices': ['p1', 'p2', 'p3', 'p4', 'p5', 'p6']
         }
         answers = prompt(directions_prompt)
         return answers['plan']
@@ -53,29 +54,30 @@ class Cli:
             'type': 'list',
             'name': 'os',
             'message': 'Which os would you like to choose?',
-            'choices': ['o1', 'o2', 'o3', 'o4','o5','o6']
+            'choices': ['o1', 'o2', 'o3', 'o4', 'o5', 'o6']
         }
         answers = prompt(directions_prompt)
         return answers['os']
-    # TODO better to use while loop than recursion!
 
+    # TODO better to use while loop than recursion!
 
     def main(self):
         print('You find yourself in a small room, there is a door in front of you.')
-        #exit_house()
-        action()
+        # exit_house()
+        # action()
+
     def request_progress(self):
         directions_prompt = {
             'type': 'list',
             'name': 'request_prog',
             'message': '  would you like to monitor the progress of your request?',
-            'choices': ['YES','NO']
+            'choices': ['YES', 'NO']
         }
         answers = prompt(directions_prompt)
         return answers['request_prog']
 
     def get_vm_details(self):
-        vmDetails=[]
+        vmDetails = []
         VmNumber = self.vm_number_input()
         for i in range(0, VmNumber):
             vmName = self.vm_name_input()
@@ -86,11 +88,11 @@ class Cli:
         return vmDetails
 
     def performe_CreateVM(self):
-        vmDetails=self.get_vm_details()
-        monitor=self.request_progress()
-        self.requestSummary( vmDetails, monitor)
-
-
+        vmDetails = self.get_vm_details()
+        monitor = self.request_progress()
+        vm_list = self.requestSummary(vmDetails, monitor)
+        response = requests.post('http://127.0.0.1:5000/server', json=vm_list)
+        print(response)
 
     def action(self):
         action = self.ask_action()
@@ -107,17 +109,15 @@ class Cli:
         elif (action == 'VmEvents'):
             print('VmEvents')
 
-
-    def requestSummary(self,vmDetails,monitor):
+    def requestSummary(self, vmDetails, monitor):
         print("..")
-        summary=[]
+        summary = []
         for i in vmDetails:
             thisdict = {
-                "vmNname": i[0],
-                "vmZone": i[1],
-                "vmPlan": i[2],
-                "vmOs": i[3]
-
+                "hostname": i[0],
+                "zone": i[1],
+                "plan": i[2],
+                "os": i[3]
             }
 
             summary.append(thisdict)
@@ -125,11 +125,11 @@ class Cli:
         print("VMs DETAILS \n\n\n")
         print(summary)
         print("\n\n\n")
-        print("MONITORING CHOICE: ",monitor,"\n\n\n")
-
+        print("MONITORING CHOICE: ", monitor, "\n\n\n")
+        return summary
 
     def encounter2a(self):
-        direction = ask_action()
+        direction = self.ask_action()
         if direction == 'Forward':
             output = 'You find a painted wooden sign that says:'
             output += ' \n'
@@ -140,7 +140,7 @@ class Cli:
             print(output)
         else:
             print('You cannot go that way')
-            encounter2a()
+            # encounter2a()
 
     def vm_name_input(self):
         questions = [
@@ -152,7 +152,6 @@ class Cli:
         ]
         answers = prompt(questions)
         return answers['vmName']
-
 
     def vm_number_input(self):
         questions = [
@@ -179,8 +178,9 @@ class Cli:
     #     },  style=style)
     #     print('The wolf mauls you. You die. The end.')
 
-
     # if __name__ == '__main__':
     #     main()
-ins=Cli()
+
+
+ins = Cli()
 ins.performe_CreateVM()

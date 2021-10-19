@@ -16,6 +16,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 
+
 class Upcloud_API:
     def __init__(self):
         self.manager = upcloud_api.CloudManager('tapaug2021ee', 'gr4D334uG2021')
@@ -39,22 +40,22 @@ class Upcloud_API:
             key_size=2048,
             backend=default_backend()
         )
-        #generate the public key
-        public_key = private_key.public_key().public_bytes(serialization.Encoding.OpenSSH, serialization.PublicFormat.OpenSSH)
+        # generate the public key
+        public_key = private_key.public_key().public_bytes(serialization.Encoding.OpenSSH,
+                                                           serialization.PublicFormat.OpenSSH)
         public_key = public_key.decode(encoding='UTF-8')
         # get private key in PEM container format
         pem = private_key.private_bytes(encoding=serialization.Encoding.PEM,
-                                format=serialization.PrivateFormat.TraditionalOpenSSL,
-                                encryption_algorithm=serialization.NoEncryption())
+                                        format=serialization.PrivateFormat.TraditionalOpenSSL,
+                                        encryption_algorithm=serialization.NoEncryption())
         login_user = login_user_block(
-            username='test_user',
+            username='root',
             ssh_keys=[public_key],
             create_password=False
         )
-        with open('private_key.pem','wb') as f:
+        with open('private_key.pem', 'wb') as f:
             f.write(pem)
         return login_user
-
 
     # def get_zones(self):
     #     zones = self.manager.get_zones()['zones']['zone']
@@ -63,7 +64,6 @@ class Upcloud_API:
     #     for zone in zones:
     #         zone_list.append(zone['id'])
     #     return zone_list
-
 
     def get_templates(self):
         templates = self.manager.get_templates()
@@ -79,9 +79,8 @@ class Upcloud_API:
         #         continue
         #     i += 1
 
-
-    #new server creation
-    def create_server(self, plan, zone, hostname, os, os_size, sec_stg_size,sec_stg_tier,login_user):
+    # new server creation
+    def create_server(self, plan, zone, hostname, os, os_size, login_user):
         server = Server(
             plan=plan,
             hostname=hostname,
@@ -92,7 +91,7 @@ class Upcloud_API:
                 # default tier: maxIOPS, the 100k IOPS storage backend
                 Storage(os=os, size=os_size),
                 # secondary storage, hdd for reduced speed & cost
-                Storage(size=sec_stg_size, tier=sec_stg_tier)
+                # Storage(size=sec_stg_size, tier=sec_stg_tier)
             ],
             login_user=login_user  # user and ssh-keys
         )
@@ -100,28 +99,28 @@ class Upcloud_API:
         # server.add_tags([self.tag])
         return server
 
-    #get all server list
+    # get all server list
     def server_list(self):
         servers = self.manager.get_servers()
-        server_list=[]
+        server_list = []
         for server in servers:
             server_list.append(server.to_dict())
         return server_list
 
-    #get one server details
-    def single_server(self,uuid):
+    # get one server details
+    def single_server(self, uuid):
         server = self.manager.get_server(uuid).to_dict()
         return server
 
-    def access_console(self,uuid):
+    def access_console(self, uuid):
         try:
             server = self.manager.get_server(uuid).to_dict()
             ip_addr = server['ip_addresses']
             for ip in ip_addr:
-                if ip['access'] =='public' and ip['family'] == 'IPv4':
+                if ip['access'] == 'public' and ip['family'] == 'IPv4':
                     ssh = paramiko.SSHClient()
                     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                    ssh.connect(ip['address'],port=22,username='test_user',key_filename='.\private_key.pem')
+                    ssh.connect(ip['address'], port=22, username='test_user', key_filename='.\private_key.pem')
                     command = 'uname -r '
                     stdin, stdout, stderr = ssh.exec_command(command)
                     lines = stdout.readlines()
@@ -130,9 +129,8 @@ class Upcloud_API:
         except Exception as e:
             raise e
 
-
-    #delete a vm based on the uuid
-    def rm_server(self,uuid):
+    # delete a vm based on the uuid
+    def rm_server(self, uuid):
         server = self.manager.get_server(uuid)
         if server.to_dict()["state"] != "stopped":
             server.shutdown(hard=True)
@@ -140,6 +138,7 @@ class Upcloud_API:
             pass
         self.manager.delete_server(uuid)
         return "Selected server deleted."
+
 
 if __name__ == '__main__':
     ins = Upcloud_API()
@@ -154,13 +153,13 @@ if __name__ == '__main__':
     # new_server=ins.server("2xCPU-4GB","uk-lon1","web1.example.com",login_user)
     # ins.rm_server("0021e1da-be14-4440-8de6-f04b0650926b")
 
-#get server details
+# get server details
 # print(self.manager.get_server("0021e1da-be14-4440-8de6-f04b0650926b").to_dict())
-#get server states
+# get server states
 # print(manager.get_server("0021e1da-be14-4440-8de6-f04b0650926b").to_dict()['state'])
-#delete vms (stop first)
+# delete vms (stop first)
 
-#access the console of VM
+# access the console of VM
 
 
 # @app.route('/')
