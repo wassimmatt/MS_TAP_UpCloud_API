@@ -14,7 +14,7 @@ class Upcloud_API:
     def __init__(self):
         self.manager = upcloud_api.CloudManager('tapaug2021ee', 'gr4D334uG2021')
         self.manager.authenticate()
-        self.myLogger = logs.vmlogs()
+        # self.myLogger = logs.vmlogs()
         self.login_user = self.key_pair_login()
         self.planList=[ "1xCPU-2GB","1xCPU-1GB","2xCPU-4GB","4xCPU-8GB","6xCPU-16GB","8xCPU-32GB","12xCPU-48GB","16xCPU-64GB","20xCPU-96GB","20xCPU-128G"]
 
@@ -54,7 +54,7 @@ class Upcloud_API:
         return templates
 
     #new server creation
-    def create_server(self, plan, zone, hostname, os, os_size, login_user):
+    def create_server(self, plan, zone, hostname, os, os_size):
         server = Server(
             plan=plan,
             hostname=hostname,
@@ -66,9 +66,9 @@ class Upcloud_API:
         )
 
         server = self.manager.create_server(server)
-        server_uuid = server.to_dict()['uuid']
-        server_name = server.to_dict()['hostname']
-        self.myLogger.info_logger(server_name+' with uuid: '+ server_uuid + " was created at "+ str(datetime.now()))
+        # server_uuid = server.to_dict()['uuid']
+        # server_name = server.to_dict()['hostname']
+        # self.myLogger.info_logger(server_name+' with uuid: '+ server_uuid + " was created at "+ str(datetime.now()))
         self.server_status(server)
         return server
 
@@ -76,13 +76,8 @@ class Upcloud_API:
     def server_status(self,uuid):
         server_status = self.manager.get_server(uuid).to_dict()['state']
         server_name = self.manager.get_server(uuid).to_dict()['hostname']
-        return "Current status of server: "+server_name+ ":"+uuid+"  is "+server_status
+        return server_status
 
-    #get current server status
-    def server_status(self,uuid):
-        server_status = self.manager.get_server(uuid).to_dict()['state']
-        server_name = self.manager.get_server(uuid).to_dict()['hostname']
-        return "Current status of server: "+server_name+" is "+server_status
 
     #get all server list
     def server_list(self):
