@@ -18,7 +18,7 @@ class Shell:
     def execute(self, cmd):
         cmd = cmd.strip('\n')
         self.stdin.write(cmd + '\n')
-        finish = 'end of stdOUT buffer. finished with exit status'
+        finish = 'exit status'
         echo_cmd = 'echo {} $?'.format(finish)
         self.stdin.write(echo_cmd + '\n')
         shin = self.stdin
