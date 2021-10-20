@@ -9,6 +9,7 @@ import json
 from PyInquirer import prompt, Separator
 from Upcloud_API import Upcloud_API
 from shell import Shell
+import logs
 
 # from requests import requests
 style = style_from_dict({
@@ -27,6 +28,7 @@ baseURL = 'http://127.0.0.1:5000'
 class Cli:
     def __init__(self):
         self.manager = Upcloud_API()
+        self.mylogger = logs.Logs()
 
     def ask_action(self):
         directions_prompt = {
@@ -114,7 +116,7 @@ class Cli:
             print('########EXITING PROGRAM THANKS##########')
             exit()
             
-  def get_vm_details(self):
+    def get_vm_details(self):
         vmDetails=[]
         zone = self.ask_zone()
         plan = self.ask_plan()
@@ -248,16 +250,19 @@ class Cli:
                 len(vm_list)))
             response = requests.post(baseURL + '/server', json=json.dumps(vm))
             new_uuid_list.append(response.json()['uuid'])
+            self.mylogger.info_logger('The Server: ' + response.json()['uuid'] + ' is in '+response.json()['state'] + ' status.')
         count = 1
-        if monitor == 'YES':
-            while new_uuid_list:
-                for uuid in new_uuid_list:
-                    status = self.get_server_status(uuid)
-                    if status != 'maintenance':
+        while new_uuid_list:
+            for uuid in new_uuid_list:
+                status = self.get_server_status(uuid)
+                if status != 'maintenance':
+                    if monitor == 'YES':
                         print("Server " + str(count) + "/" + str(len(vm_list)) + ": " + status)
                         self.after_create_info(uuid)
                         count += 1
                         new_uuid_list.remove(uuid)
+                    self.mylogger.info_logger('The Server: '+uuid+' is in '+status+' status.')
+
 
     def performe_deleteVm(self):
         uuid = self.get_delete_choice()
@@ -328,6 +333,13 @@ class Cli:
         for line in perf_details:
             print(line.strip())
 
+    def perform_events(self):
+        uuid = self.get_delete_choice()
+        response = requests.get(baseURL + '/logs/'+uuid)
+        logs = response.json()
+        for line in logs:
+            print(line.strip())
+
     def action(self):
         print('#############WELCOME#############')
         action = self.ask_action()
@@ -344,7 +356,7 @@ class Cli:
             elif (action == 'PerformanceStat'):
                 self.perfome_checkPerformance()
             elif (action == 'VmEvents'):
-                print('VmEvents')
+                self.perform_events()
             elif (action == 'Exit'):
                 print('########EXITING PROGRAM THANKS##########')
                 break
@@ -440,4 +452,4 @@ class Cli:
 
 
 ins = Cli()
-ins.perfome_VmConsole()
+ins.action()
