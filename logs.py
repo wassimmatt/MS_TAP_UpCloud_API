@@ -13,5 +13,6 @@ class Logs:
     def error_logger(self, content):
         logging.error(content)
 
-    def debug_logger(self, content):
+    def debug_logger(self,content):
         logging.debug(content)
+
