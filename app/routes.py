@@ -51,7 +51,7 @@ def get_server_perf(uuid):
 
 @app.route('/server/stop/<uuid>', methods=['DELETE'])
 def stop_server(uuid):
-    api.stop_server(uuid)
+    api.server_stop(uuid)
     return "Stopping server"
 
 

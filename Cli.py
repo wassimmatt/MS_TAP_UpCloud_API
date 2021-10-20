@@ -264,6 +264,7 @@ class Cli:
                 output_list = new_output.split('\n')
                 output_list.pop(0)
                 for count, line in enumerate(output_list):
+                    line = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]').sub('', line).replace('\b', '').replace('\r', '')
                     if count == len(output_list) - 1:
                         print(line, end='')
                     else:
@@ -402,4 +403,4 @@ class Cli:
 
 
 ins = Cli()
-ins.perfome_checkPerformance()
+ins.perfome_VmConsole()
