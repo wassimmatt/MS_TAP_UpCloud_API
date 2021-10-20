@@ -6,7 +6,6 @@ from flask import request, jsonify
 
 api = Upcloud_API()
 
-# 00c522f1-2e86-4d49-b5fe-5920cd855fff
 
 @app.route('/server', methods=['POST'])
 def create_server():
