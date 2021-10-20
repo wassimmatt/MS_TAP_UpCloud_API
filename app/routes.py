@@ -75,3 +75,8 @@ def get_plans():
 def get_templates():
     response = api.get_templates()
     return jsonify(response)
+
+@app.route('/logs/<uuid>',methods=['GET'])
+def get_log(uuid):
+    response = api.check_log(uuid)
+    return jsonify(response)
