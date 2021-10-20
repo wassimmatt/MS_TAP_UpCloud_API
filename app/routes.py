@@ -6,25 +6,8 @@ from flask import request, jsonify
 
 api = Upcloud_API()
 
-sample_start_server = [
-    {
-        "plan": "2xCPU-4GB",
-        "zone": "uk-lon1",
-        "hostname": "jwm-jason",
-        "os": "01000000-0000-4000-8000-000050010300",
-        "size": 80
-    },
-    {
-        "plan": "2xCPU-4GB",
-        "zone": "uk-lon1",
-        "hostname": "jwm-jason",
-        "os": "01000000-0000-4000-8000-000050010300",
-        "size": 80
-    }
-]
 
-
-# 006a7b12-3e1b-45a2-9f71-0aa217cf67b4
+# 00c522f1-2e86-4d49-b5fe-5920cd855fff
 
 @app.route('/server', methods=['POST'])
 def create_server():
