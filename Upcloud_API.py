@@ -26,12 +26,11 @@ class Upcloud_API:
 
     # get public key from the existing private key
     def get_login_user(self):
-        with open('.\private_key.pem', 'rb') as file:
+        with open('private_key.pem', 'rb') as file:
             private_key = serialization.load_pem_private_key(file.read(), None, default_backend())
             public_key = private_key.public_key().public_bytes(serialization.Encoding.OpenSSH,
                                                                serialization.PublicFormat.OpenSSH)
             public_key = public_key.decode(encoding='UTF-8')
-        file.close()
         login_user = login_user_block(
             username='root',
             ssh_keys=[public_key],
