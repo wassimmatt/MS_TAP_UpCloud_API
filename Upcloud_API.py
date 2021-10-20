@@ -77,7 +77,9 @@ class Upcloud_API:
         server_status = self.manager.get_server(uuid).to_dict()['state']
         server_name = self.manager.get_server(uuid).to_dict()['hostname']
         return server_status
-
+    
+    def server_name(self,uuid):
+        return self.manager.get_server(uuid).to_dict()['hostname']
 
     #get all server list
     def server_list(self):
