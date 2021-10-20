@@ -93,16 +93,6 @@ class Upcloud_API:
             if i['access']=='public' and i['family']== 'IPv4':
                 return i['address']
 
-    def server_name(self,uuid):
-        return self.manager.get_server(uuid).to_dict()['hostname']
-
-    #get server ip
-    def server_ip(self, uuid):
-        for i in self.manager.get_server(uuid).to_dict()['ip_addresses']:
-            if i['access']=='public' and i['family']== 'IPv4':
-                return i['address']
-
-    # get all server list
     def server_list(self):
         servers = self.manager.get_servers()
         server_list = []
@@ -115,23 +105,6 @@ class Upcloud_API:
         server = self.manager.get_server(uuid).to_dict()
         return server
 
-    def access_console(self, uuid):
-        try:
-            server = self.manager.get_server(uuid).to_dict()
-            ip_addr = server['ip_addresses']
-            for ip in ip_addr:
-                if ip['access'] == 'public' and ip['family'] == 'IPv4':
-                    ssh = paramiko.SSHClient()
-                    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                    ssh.connect(ip['address'], port=22, username='test_user', key_filename='.\private_key.pem')
-                    command = 'uname -r '
-                    stdin, stdout, stderr = ssh.exec_command(command)
-                    lines = stdout.readlines()
-                    print(lines)
-                    break
-        except Exception as e:
-            raise e
-
     # check the performance of linux server
     def perform_statistic_linux(self, uuid):
         try:
@@ -139,15 +112,21 @@ class Upcloud_API:
             ip_addr = server['ip_addresses']
             perform_info = []
             for ip in ip_addr:
-                if ip['access'] == 'public' and ip['family'] == 'IPv4':
+                if ip['access'] =='public' and ip['family'] == 'IPv4':
                     ssh = paramiko.SSHClient()
                     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                    ssh.connect(ip['address'], port=22, username='root', key_filename='private_key.pem')
+                    ssh.connect(ip['address'],port=22,username='root',key_filename='private_key.pem')
                     command = 'export TERM=xterm && top -n 1 -b'
                     # command = 'export TERM=xterm && mpstat'
                     stdin, stdout, stderr = ssh.exec_command(command)
-                    lines = stdout.readlines()
+                    lines = stdout.readlines()[0:5]
+                    lines.insert(0, '--------------------------------Resource Usage-----------------------------------')
                     err_lines = stderr.readlines()
+                    command = 'export TERM=xterm && df'
+                    stdin, stdout, stderr = ssh.exec_command(command)
+                    lines.append('----------------------------------Disk Filesystem--------------------------------')
+                    lines.extend(stdout)
+                    err_lines.extend(stderr)
                     break
             if err_lines:
                 return err_lines

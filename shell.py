@@ -32,6 +32,7 @@ class Shell:
 
 if __name__ == '__main__':
     sh = Shell('94.237.57.153', 'root', 'private_key_save.pem')
+    # Print initial command line
     while True:
         if sh.channel.recv_ready():
             output = sh.channel.recv(1024)
