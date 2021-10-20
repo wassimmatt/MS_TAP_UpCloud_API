@@ -1,12 +1,13 @@
 from __future__ import print_function, unicode_literals
 
+import json
 import re
 import time
 
 import requests
-from PyInquirer import style_from_dict, Token, prompt, Separator
-import json
-from PyInquirer import prompt, Separator
+from PyInquirer import prompt
+from PyInquirer import style_from_dict, Token
+
 from Upcloud_API import Upcloud_API
 from shell import Shell
 import logs
@@ -35,7 +36,7 @@ class Cli:
             'type': 'list',
             'name': 'action',
             'message': 'Which action would you like to perform?',
-            'choices': ['CreateVM', 'CheckVmStatus', 'DeleteVm', 'VmConsole', 'PerformanceStat', 'VmEvents']
+            'choices': ['CreateVM', 'CheckVmStatus', 'DeleteVm', 'VmConsole', 'PerformanceStat', 'VmEvents','EXIT']
         }
         answers = prompt(directions_prompt)
         return answers['action']
@@ -98,12 +99,13 @@ class Cli:
         }
         answers = prompt(directions_prompt)
         return answers['request_prog']
+    
     def choice_confirm(self):
         directions_prompt = {
             'type': 'list',
             'name': 'confirm_option',
             'message': 'please confirm your options?',
-            'choices': ['Confirm','Choose again','Return To the Main Menu','EXIT']
+            'choices': ['Confirm','Choose again','Return To the Main Menu']
         }
         answers = prompt(directions_prompt)
         if answers['confirm_option'] == "Confirm":
@@ -112,9 +114,7 @@ class Cli:
             self.get_vm_details()
         elif answers['confirm_option'] == "Return To the Main Menu":
             self.action()
-        elif answers['delete_option'] == "EXIT":
-            print('########EXITING PROGRAM THANKS##########')
-            exit()
+
             
     def get_vm_details(self):
         vmDetails=[]
@@ -291,7 +291,7 @@ class Cli:
             if i['access']=='public' and i['family']== 'IPv4':
                 ip = i['address']
         print("Connecting to the VM...")
-        sh = Shell(ip, 'root', 'private_key_save.pem')
+        sh = Shell(ip, 'root', 'private_key.pem')
         # Print initial command line
         while True:
             if sh.channel.recv_ready():
@@ -359,7 +359,7 @@ class Cli:
                 self.perform_events()
             elif (action == 'Exit'):
                 print('########EXITING PROGRAM THANKS##########')
-                break
+                exit()
             action = self.ask_action()
 
     def requestSummary(self, vmDetails, monitor):
@@ -451,5 +451,8 @@ class Cli:
     #     main()
 
 
-ins = Cli()
-ins.action()
+
+if __name__ == '__main__':
+    ins = Cli()
+    ins.action()
+

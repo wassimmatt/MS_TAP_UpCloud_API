@@ -1,13 +1,17 @@
-import upcloud_api
-from upcloud_api import Server, Storage, Tag, login_user_block
+import os
+from datetime import datetime
+
 import paramiko
 from cryptography import x509
+import upcloud_api
+# from upcloud_api.storage import BackupDeletionPolicy
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
-from datetime import datetime
+from cryptography.hazmat.primitives.asymmetric import rsa
+from upcloud_api import Server, Storage, login_user_block
 import logs
 import os
+
 
 class Upcloud_API:
     def __init__(self):
@@ -23,12 +27,11 @@ class Upcloud_API:
 
     # get public key from the existing private key
     def get_login_user(self):
-        with open('.\private_key.pem','rb') as file:
-            private_key = serialization.load_pem_private_key(file.read(),None,default_backend())
+        with open('private_key.pem', 'rb') as file:
+            private_key = serialization.load_pem_private_key(file.read(), None, default_backend())
             public_key = private_key.public_key().public_bytes(serialization.Encoding.OpenSSH,
                                                                serialization.PublicFormat.OpenSSH)
             public_key = public_key.decode(encoding='UTF-8')
-        file.close()
         login_user = login_user_block(
             username='root',
             ssh_keys=[public_key],
@@ -72,7 +75,7 @@ class Upcloud_API:
         templates = self.manager.get_templates()
         return templates
 
-    #new server creation
+    # new server creation
     def create_server(self, plan, zone, hostname, os, os_size):
         server = Server(
             plan=plan,
@@ -93,7 +96,6 @@ class Upcloud_API:
     def server_status(self, uuid):
         server_status = self.manager.get_server(uuid).to_dict()['state']
         server_name = self.manager.get_server(uuid).to_dict()['hostname']
-        # self.mylogger.info_logger('The status of Server:' + server_name + ':' + uuid + ' is '+server_status)
         return server_status
 
     # get all server list
@@ -116,10 +118,10 @@ class Upcloud_API:
             ip_addr = server['ip_addresses']
             perform_info = []
             for ip in ip_addr:
-                if ip['access'] =='public' and ip['family'] == 'IPv4':
+                if ip['access'] == 'public' and ip['family'] == 'IPv4':
                     ssh = paramiko.SSHClient()
                     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                    ssh.connect(ip['address'],port=22,username='root',key_filename='private_key.pem')
+                    ssh.connect(ip['address'], port=22, username='root', key_filename='private_key.pem')
                     command = 'export TERM=xterm && top -n 1 -b'
                     # command = 'export TERM=xterm && mpstat'
                     stdin, stdout, stderr = ssh.exec_command(command)
@@ -139,31 +141,31 @@ class Upcloud_API:
         except Exception as e:
             raise e
 
-    def server_stop(self,uuid):
+    def server_stop(self, uuid):
         server = self.manager.get_server(uuid)
         if server.to_dict()['state'] != 'stopped':
             server.shutdown(hard=True)
-        self.mylogger.info_logger('Server: '+ uuid + ' has been stopped.')
+        self.mylogger.info_logger('Server: ' + uuid + ' has been stopped.')
 
     # delete a vm based on the uuid
     def rm_server(self, uuid):
         try:
             self.manager.delete_server(uuid)
-            self.mylogger.info_logger('Server: ' +uuid + ' has been deleted.')
+            self.mylogger.info_logger('Server: ' + uuid + ' has been deleted.')
             return "SUCCESS"
         except Exception as e:
             return str(e)
 
-
-    #check log of a specific server
-    def check_log(self,uuid):
-        with open("app.log",'r') as file:
+    # check log of a specific server
+    def check_log(self, uuid):
+        with open("app.log", 'r') as file:
             lines = file.readlines()
-            server_log =[]
+            server_log = []
             for line in lines:
                 if uuid in line:
                     server_log.append(line)
         return server_log
+
 
 if __name__ == '__main__':
     ins = Upcloud_API()
