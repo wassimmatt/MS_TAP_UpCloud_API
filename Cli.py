@@ -33,7 +33,7 @@ class Cli:
             'type': 'list',
             'name': 'action',
             'message': 'Which action would you like to perform?',
-            'choices': ['CreateVM', 'CheckVmStatus', 'DeleteVm', 'VmConsole', 'PerformanceStat', 'VmEvents']
+            'choices': ['CreateVM', 'CheckVmStatus', 'DeleteVm', 'VmConsole', 'PerformanceStat', 'VmEvents', 'Exit']
         }
         answers = prompt(directions_prompt)
         return answers['action']
@@ -97,7 +97,7 @@ class Cli:
         answers = prompt(directions_prompt)
         return answers['request_prog']
 
-  def get_vm_details(self):
+    def get_vm_details(self):
         vmDetails=[]
         zone = self.ask_zone()
         plan = self.ask_plan()
@@ -244,19 +244,18 @@ class Cli:
 
     def performe_deleteVm(self):
         uuid = self.get_delete_choice()
-        monitor = self.request_progress()
+        print("Deleting VM...")
         requests.delete(baseURL + '/server/stop/' + uuid)
-        if monitor == 'YES':
-            while True:
-                status = self.get_server_status(uuid)
-                if status == 'stopped':
-                    break
-            print("Server status: stopped")
+        while True:
+            status = self.get_server_status(uuid)
+            if status == 'stopped':
+                break
+        print("Server status: stopped")
         response = requests.delete(baseURL + '/server/' + uuid)
         if response.text == 'SUCCESS':
             print("Server status (uuid: " + uuid + "): destroyed.")
         else:
-            print("Failed to destroy server (uuid: " + uuid + "): response.text")
+            print("Failed to destroy server (uuid: " + uuid + "): " + response.text)
 
     def performe_CheckVmStatus(self):
         self.get_checkStatus_choice()
@@ -269,7 +268,7 @@ class Cli:
             if i['access']=='public' and i['family']== 'IPv4':
                 ip = i['address']
         print("Connecting to the VM...")
-        sh = Shell(ip, 'root', 'private_key_save.pem')
+        sh = Shell(ip, 'root', 'private_key.pem')
         # Print initial command line
         while True:
             if sh.channel.recv_ready():
@@ -321,7 +320,6 @@ class Cli:
                 self.performe_CheckVmStatus()
             elif (action == 'DeleteVm'):
                 self.performe_deleteVm()
-                print(self.get_all_servers_list())
             elif (action == 'VmConsole'):
                 self.perfome_VmConsole()
             elif (action == 'PerformanceStat'):
@@ -423,4 +421,4 @@ class Cli:
 
 
 ins = Cli()
-ins.perfome_VmConsole()
+ins.action()

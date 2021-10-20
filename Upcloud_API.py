@@ -18,7 +18,7 @@ class Upcloud_API:
         self.manager = upcloud_api.CloudManager('tapaug2021ee', 'gr4D334uG2021')
         self.manager.authenticate()
         if os.path.isfile('.\private_key.pem'):
-            self.get_login_user()
+            self.login_user = self.get_login_user()
         else:
             self.login_user = self.key_pair_create()
         self.planList = ["1xCPU-2GB", "1xCPU-1GB", "2xCPU-4GB", "4xCPU-8GB", "6xCPU-16GB", "8xCPU-32GB", "12xCPU-48GB",
@@ -28,11 +28,9 @@ class Upcloud_API:
     def get_login_user(self):
         with open('.\private_key.pem','rb') as file:
             private_key = serialization.load_pem_private_key(file.read(),None,default_backend())
-            public_key = private_key.private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.TraditionalOpenSSL,
-                encryption_algorithm=serialization.NoEncryption())
-            public_key = public_key.decode('utf-8')
+            public_key = private_key.public_key().public_bytes(serialization.Encoding.OpenSSH,
+                                                               serialization.PublicFormat.OpenSSH)
+            public_key = public_key.decode(encoding='UTF-8')
         file.close()
         login_user = login_user_block(
             username='root',
@@ -53,7 +51,6 @@ class Upcloud_API:
                                                            serialization.PublicFormat.OpenSSH)
         public_key = public_key.decode(encoding='UTF-8')
         # get private key in PEM container format
-        public_key = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGRPNg31+bO29aLrXisdz2H4DxBn1xRdcX3lJ/2yMHgrm8AVSP/R7dYLJIGjymoUTfRrkEZ1PlSaDl5JCkJqwT23N2zP6DvLEH23ZX5V8PGe02GKJSngmP71KED1EiF4FVBIeu6+U4jwnr3vB+ghPTPqUx0TZFra+klYp/khXEAEfIp/+VLVyDvAfpjZugm6jGqFxUKmSHbLZq3A4WuAyjGiZMC8mMKkYPcOej4mCNCI2wfRkh2un4YU5rfxQAvj6WHfWxSQuXJzidhQeKQyz/GSjbmtusPohyU2GjvbN2uSOjoTcXGXdK3+RJq0YEHqGiGfM2FQBpM7x1hXwEVXVL'
         pem = private_key.private_bytes(encoding=serialization.Encoding.PEM,
                                         format=serialization.PrivateFormat.TraditionalOpenSSL,
                                         encryption_algorithm=serialization.NoEncryption())
@@ -63,8 +60,8 @@ class Upcloud_API:
             create_password=False
         )
         self.mylogger.info_logger('A private_key.pem file is generated and stored for user: root.')
-        # with open('private_key.pem', 'wb') as f:
-        #     f.write(pem)
+        with open('private_key.pem', 'wb') as f:
+            f.write(pem)
         return login_user
 
     def get_zones(self):
@@ -101,25 +98,6 @@ class Upcloud_API:
         server_name = self.manager.get_server(uuid).to_dict()['hostname']
         self.mylogger.info_logger('The status of Server:' + server_name + ':' + uuid + ' is '+server_status + ' at '+str(datetime.now()))
         return server_status
- 
-
-    def server_name(self,uuid):
-        return self.manager.get_server(uuid).to_dict()['hostname']
-
-    #get server ip
-    def server_ip(self, uuid):
-        for i in self.manager.get_server(uuid).to_dict()['ip_addresses']:
-            if i['access']=='public' and i['family']== 'IPv4':
-                return i['address']
-
-    def server_name(self, uuid):
-        return self.manager.get_server(uuid).to_dict()['hostname']
-
-    #get server ip
-    def server_ip(self, uuid):
-        for ip in self.manager.get_server(uuid).to_dict()['ip_addresses']:
-            if ip['access']=='public' and ip['family']== 'IPv4':
-                return ip['address']
 
     # get all server list
     def server_list(self):
