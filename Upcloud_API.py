@@ -2,14 +2,15 @@ import os
 from datetime import datetime
 
 import paramiko
+from cryptography import x509
 import upcloud_api
 # from upcloud_api.storage import BackupDeletionPolicy
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from upcloud_api import Server, Storage, login_user_block
-
 import logs
+import os
 
 
 class Upcloud_API:
@@ -88,15 +89,13 @@ class Upcloud_API:
         server = self.manager.create_server(server)
         server_uuid = server.to_dict()['uuid']
         server_name = server.to_dict()['hostname']
-        self.mylogger.info_logger(server_name + ' with uuid:' + server_uuid + ' was created at ' + str(datetime.now()))
+        self.mylogger.info_logger(server_name + ' with uuid:' +server_uuid+' was created.')
         return server
 
     # get current server status
     def server_status(self, uuid):
         server_status = self.manager.get_server(uuid).to_dict()['state']
         server_name = self.manager.get_server(uuid).to_dict()['hostname']
-        self.mylogger.info_logger(
-            'The status of Server:' + server_name + ':' + uuid + ' is ' + server_status + ' at ' + str(datetime.now()))
         return server_status
 
     # get all server list
@@ -171,18 +170,18 @@ class Upcloud_API:
 if __name__ == '__main__':
     ins = Upcloud_API()
     # ins.get_login_user()
-    # ins.check_log('0028ea76-cb26-43e7-9862-d89d164e2a6a')
+    # print(ins.check_log('00c9f070-5cee-482f-97a8-24fb848d948d'))
     # print(ins.server_list())
     # print(ins.get_zones())
     # print(ins.get_templates())
     # print(ins.single_server('00effc4b-47f5-4394-a357-0750c810b096'))
     # print(ins.access_console('00effc4b-47f5-4394-a357-0750c810b096'))
     # print(ins.server_list())
-    # print(ins.server_status('00adca12-fb12-4a54-9001-36cd2725aa4c'))
+    print(ins.server_status('0005cdb3-a035-4625-bf7d-449117a2b7cc'))
     # print(ins.perform_statistic_linux('0028ea76-cb26-43e7-9862-d89d164e2a6a'))
     # print(ins.create_server("2xCPU-4GB","uk-lon1","maggie.jmw.com", "01000000-0000-4000-8000-000030200200", "10"))
-    # print(ins.server_stop('00adca12-fb12-4a54-9001-36cd2725aa4c'))
-    print(ins.rm_server("00adca12-fb12-4a54-9001-36cd2725aa4c"))
+    # print(ins.server_stop('00c9f070-5cee-482f-97a8-24fb848d948d'))
+    # print(ins.rm_server("00c9f070-5cee-482f-97a8-24fb848d948d"))
 # get server details
 # print(self.manager.get_server("0021e1da-be14-4440-8de6-f04b0650926b").to_dict())
 # get server states
