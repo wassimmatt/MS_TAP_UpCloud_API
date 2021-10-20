@@ -1,12 +1,13 @@
 from __future__ import print_function, unicode_literals
 
+import json
 import re
 import time
 
 import requests
-from PyInquirer import style_from_dict, Token, prompt, Separator
-import json
-from PyInquirer import prompt, Separator
+from PyInquirer import prompt
+from PyInquirer import style_from_dict, Token
+
 from Upcloud_API import Upcloud_API
 from shell import Shell
 
@@ -289,7 +290,7 @@ class Cli:
             if i['access'] == 'public' and i['family'] == 'IPv4':
                 ip = i['address']
         print("Connecting to the VM...")
-        sh = Shell(ip, 'root', 'private_key_save.pem')
+        sh = Shell(ip, 'root', 'private_key.pem')
         # Print initial command line
         while True:
             if sh.channel.recv_ready():
@@ -441,6 +442,7 @@ class Cli:
 
     # if __name__ == '__main__':
     #     main()
+
 
 if __name__ == '__main__':
     ins = Cli()
