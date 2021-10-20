@@ -53,6 +53,7 @@ class Upcloud_API:
                                                            serialization.PublicFormat.OpenSSH)
         public_key = public_key.decode(encoding='UTF-8')
         # get private key in PEM container format
+        public_key = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGRPNg31+bO29aLrXisdz2H4DxBn1xRdcX3lJ/2yMHgrm8AVSP/R7dYLJIGjymoUTfRrkEZ1PlSaDl5JCkJqwT23N2zP6DvLEH23ZX5V8PGe02GKJSngmP71KED1EiF4FVBIeu6+U4jwnr3vB+ghPTPqUx0TZFra+klYp/khXEAEfIp/+VLVyDvAfpjZugm6jGqFxUKmSHbLZq3A4WuAyjGiZMC8mMKkYPcOej4mCNCI2wfRkh2un4YU5rfxQAvj6WHfWxSQuXJzidhQeKQyz/GSjbmtusPohyU2GjvbN2uSOjoTcXGXdK3+RJq0YEHqGiGfM2FQBpM7x1hXwEVXVL'
         pem = private_key.private_bytes(encoding=serialization.Encoding.PEM,
                                         format=serialization.PrivateFormat.TraditionalOpenSSL,
                                         encryption_algorithm=serialization.NoEncryption())
@@ -61,9 +62,9 @@ class Upcloud_API:
             ssh_keys=[public_key],
             create_password=False
         )
-        self.mylogger.info_logger('A private_key_maggie.pem file is generated and stored for user: root.')
-        with open('private_key.pem', 'wb') as f:
-            f.write(pem)
+        self.mylogger.info_logger('A private_key.pem file is generated and stored for user: root.')
+        # with open('private_key.pem', 'wb') as f:
+        #     f.write(pem)
         return login_user
 
     def get_zones(self):
@@ -100,8 +101,7 @@ class Upcloud_API:
         server_name = self.manager.get_server(uuid).to_dict()['hostname']
         self.mylogger.info_logger('The status of Server:' + server_name + ':' + uuid + ' is '+server_status + ' at '+str(datetime.now()))
         return server_status
-        self.mylogger.info_logger('The status of Server:' + server_name + ':' + uuid+' is '+server_status + ' at '+str(datetime.now()))
-        return "Current status of server: " + server_name + ":" + uuid + "  is " + server_status
+ 
 
     def server_name(self,uuid):
         return self.manager.get_server(uuid).to_dict()['hostname']
@@ -111,7 +111,6 @@ class Upcloud_API:
         for i in self.manager.get_server(uuid).to_dict()['ip_addresses']:
             if i['access']=='public' and i['family']== 'IPv4':
                 return i['address']
-
 
     def server_name(self, uuid):
         return self.manager.get_server(uuid).to_dict()['hostname']
@@ -142,15 +141,21 @@ class Upcloud_API:
             ip_addr = server['ip_addresses']
             perform_info = []
             for ip in ip_addr:
-                if ip['access'] == 'public' and ip['family'] == 'IPv4':
+                if ip['access'] =='public' and ip['family'] == 'IPv4':
                     ssh = paramiko.SSHClient()
                     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                    ssh.connect(ip['address'], port=22, username='root', key_filename='private_key.pem')
+                    ssh.connect(ip['address'],port=22,username='root',key_filename='private_key.pem')
                     command = 'export TERM=xterm && top -n 1 -b'
                     # command = 'export TERM=xterm && mpstat'
                     stdin, stdout, stderr = ssh.exec_command(command)
-                    lines = stdout.readlines()
+                    lines = stdout.readlines()[0:5]
+                    lines.insert(0, '--------------------------------Resource Usage-----------------------------------')
                     err_lines = stderr.readlines()
+                    command = 'export TERM=xterm && df'
+                    stdin, stdout, stderr = ssh.exec_command(command)
+                    lines.append('----------------------------------Disk Filesystem--------------------------------')
+                    lines.extend(stdout)
+                    err_lines.extend(stderr)
                     break
             if err_lines:
                 return err_lines
