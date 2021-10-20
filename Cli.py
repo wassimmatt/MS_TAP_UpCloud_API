@@ -114,7 +114,7 @@ class Cli:
             self.action()
 
             
-  def get_vm_details(self):
+    def get_vm_details(self):
         vmDetails=[]
         zone = self.ask_zone()
         plan = self.ask_plan()
