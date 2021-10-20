@@ -221,10 +221,12 @@ class Cli:
 
     def performe_CheckVmStatus(self):
         self.get_checkStatus_choice()
+    
     def perfome_VmConsole(self):
         uuid=self.get_delete_choice()
-        print("uuid")
+        ip=self.manager.server_ip(uuid)
         #add the manager component
+   
     def perfome_checkPerformance(self):
         uuid=self.get_delete_choice()
         self.manager.perform_statistic_linux(uuid)
