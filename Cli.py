@@ -184,14 +184,22 @@ class Cli:
         for i in self.get_all_servers_list():
             print (self.manager.server_status(i.split(':')[1]))
 
+    def after_create_info(self,uuid,):
+        dict={
+            'VmName':self.manager.server_name(uuid),
+            'uuid': uuid,
+            'ip': self.manager.server_ip(uuid)
 
+        }
+        print(json.dumps(dict,indent=4))
+        
     def performe_CreateVM(self):
         vmDetails=self.get_vm_details()
         monitor=self.request_progress()
         vm_list=self.requestSummary( vmDetails, monitor)
         new_uuid_list = []
         for count, vm in enumerate(vm_list):
-            print("Creating server " + str(count+1) + "/" + str(len(vm_list)))
+            print("Start Creating server :"+ vm[0] +"order in the queue "+ str(count+1) + "/" + str(len(vm_list)))
             response=requests.post('http://127.0.0.1:5000/server', json=json.dumps(vm))
             new_uuid_list.append(response.json()['uuid'])
         count = 1
@@ -201,6 +209,7 @@ class Cli:
                     status = self.manager.server_status(uuid)
                     if status != 'maintenance':
                         print("Server " + str(count) + "/" + str(len(vm_list)) + ": " + status)
+                        self.after_create_info()
                         count += 1
                         new_uuid_list.remove(uuid)
 
