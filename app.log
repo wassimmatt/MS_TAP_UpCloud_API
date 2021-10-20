@@ -1,2 +1,123 @@
 2021-10-20 10:02:51,071 - A private_key.pem file is generated and stored for user: root.
 2021-10-20 10:02:51,825 - The status of Server:sabrinasystem:003f72ce-62b2-4f97-aba7-889b8bb483bf is started at 2021-10-20 10:02:51.825615
+2021-10-20 14:48:32,987 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 14:48:32,996 -  * Debugger is active!
+2021-10-20 14:48:32,999 -  * Debugger PIN: 330-678-522
+2021-10-20 14:48:33,029 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 14:53:21,898 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\key_test.py', reloading
+2021-10-20 14:53:22,688 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 14:53:22,698 -  * Debugger is active!
+2021-10-20 14:53:22,702 -  * Debugger PIN: 330-678-522
+2021-10-20 14:53:22,732 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 14:53:56,876 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\key_test.py', reloading
+2021-10-20 14:53:57,708 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 14:53:57,717 -  * Debugger is active!
+2021-10-20 14:53:57,720 -  * Debugger PIN: 330-678-522
+2021-10-20 14:53:57,750 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 14:53:59,838 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\key_test.py', reloading
+2021-10-20 14:54:00,676 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 14:54:00,686 -  * Debugger is active!
+2021-10-20 14:54:00,689 -  * Debugger PIN: 330-678-522
+2021-10-20 14:54:00,719 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 14:54:21,393 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\key_test.py', reloading
+2021-10-20 14:54:22,233 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 14:54:22,242 -  * Debugger is active!
+2021-10-20 14:54:22,245 -  * Debugger PIN: 330-678-522
+2021-10-20 14:54:22,274 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 14:55:59,254 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\app\\routes.py', reloading
+2021-10-20 14:56:00,050 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 14:56:00,060 -  * Debugger is active!
+2021-10-20 14:56:00,063 -  * Debugger PIN: 330-678-522
+2021-10-20 14:56:00,095 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 14:56:40,410 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\key_test.py', reloading
+2021-10-20 14:56:41,215 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 14:56:41,224 -  * Debugger is active!
+2021-10-20 14:56:41,227 -  * Debugger PIN: 330-678-522
+2021-10-20 14:56:41,256 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 14:56:54,979 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 14:57:08,184 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\Cli.py', reloading
+2021-10-20 14:57:08,990 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 14:57:08,999 -  * Debugger is active!
+2021-10-20 14:57:09,002 -  * Debugger PIN: 330-678-522
+2021-10-20 14:57:09,030 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 14:57:09,816 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 14:57:25,207 - 127.0.0.1 - - [20/Oct/2021 14:57:25] "GET /server/00c522f1-2e86-4d49-b5fe-5920cd855fff HTTP/1.1" 200 -
+2021-10-20 15:03:21,269 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\Cli.py', reloading
+2021-10-20 15:03:22,107 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:03:22,116 -  * Debugger is active!
+2021-10-20 15:03:22,119 -  * Debugger PIN: 330-678-522
+2021-10-20 15:03:22,148 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 15:03:28,855 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:03:31,512 - 127.0.0.1 - - [20/Oct/2021 15:03:31] "GET /server/00c522f1-2e86-4d49-b5fe-5920cd855fff HTTP/1.1" 200 -
+2021-10-20 15:03:31,678 - Connected (version 2.0, client OpenSSH_7.4)
+2021-10-20 15:03:32,185 - Authentication (publickey) successful!
+2021-10-20 15:13:53,444 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\Upcloud_API.py', reloading
+2021-10-20 15:13:54,308 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:13:54,316 -  * Debugger is active!
+2021-10-20 15:13:54,319 -  * Debugger PIN: 330-678-522
+2021-10-20 15:13:54,349 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 15:14:28,436 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\Upcloud_API.py', reloading
+2021-10-20 15:14:29,327 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:14:29,337 -  * Debugger is active!
+2021-10-20 15:14:29,339 -  * Debugger PIN: 330-678-522
+2021-10-20 15:14:29,370 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 15:15:11,774 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\Upcloud_API.py', reloading
+2021-10-20 15:15:12,577 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:15:12,586 -  * Debugger is active!
+2021-10-20 15:15:12,591 -  * Debugger PIN: 330-678-522
+2021-10-20 15:15:12,623 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 15:15:45,697 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\Cli.py', reloading
+2021-10-20 15:15:46,535 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:15:46,543 -  * Debugger is active!
+2021-10-20 15:15:46,546 -  * Debugger PIN: 330-678-522
+2021-10-20 15:15:46,576 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 15:15:50,418 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:15:57,425 - 127.0.0.1 - - [20/Oct/2021 15:15:57] "GET /zone HTTP/1.1" 200 -
+2021-10-20 15:16:01,390 - 127.0.0.1 - - [20/Oct/2021 15:16:01] "GET /plan HTTP/1.1" 200 -
+2021-10-20 15:16:02,840 - 127.0.0.1 - - [20/Oct/2021 15:16:02] "GET /template HTTP/1.1" 200 -
+2021-10-20 15:16:03,216 - 127.0.0.1 - - [20/Oct/2021 15:16:03] "GET /template HTTP/1.1" 200 -
+2021-10-20 15:16:16,656 - 127.0.0.1 - - [20/Oct/2021 15:16:16] "[35m[1mPOST /server HTTP/1.1[0m" 500 -
+2021-10-20 15:16:24,801 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:16:31,336 - 127.0.0.1 - - [20/Oct/2021 15:16:31] "GET /zone HTTP/1.1" 200 -
+2021-10-20 15:16:34,004 - 127.0.0.1 - - [20/Oct/2021 15:16:34] "GET /plan HTTP/1.1" 200 -
+2021-10-20 15:16:36,741 - 127.0.0.1 - - [20/Oct/2021 15:16:36] "GET /template HTTP/1.1" 200 -
+2021-10-20 15:16:37,104 - 127.0.0.1 - - [20/Oct/2021 15:16:37] "GET /template HTTP/1.1" 200 -
+2021-10-20 15:16:48,756 - jwm2 with uuid:00437603-fea5-40e0-92dd-a95d404a5e2c was created at2021-10-20 15:16:48.756736
+2021-10-20 15:16:49,441 - 127.0.0.1 - - [20/Oct/2021 15:16:49] "[35m[1mPOST /server HTTP/1.1[0m" 500 -
+2021-10-20 15:18:27,641 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\Upcloud_API.py', reloading
+2021-10-20 15:18:28,479 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:18:28,488 -  * Debugger is active!
+2021-10-20 15:18:28,490 -  * Debugger PIN: 330-678-522
+2021-10-20 15:18:28,521 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 15:18:37,955 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:18:42,240 - 127.0.0.1 - - [20/Oct/2021 15:18:42] "GET /zone HTTP/1.1" 200 -
+2021-10-20 15:18:44,946 - 127.0.0.1 - - [20/Oct/2021 15:18:44] "GET /plan HTTP/1.1" 200 -
+2021-10-20 15:18:47,645 - 127.0.0.1 - - [20/Oct/2021 15:18:47] "GET /template HTTP/1.1" 200 -
+2021-10-20 15:18:48,017 - 127.0.0.1 - - [20/Oct/2021 15:18:48] "GET /template HTTP/1.1" 200 -
+2021-10-20 15:18:55,946 - jwm3 with uuid:00ec8d26-8c53-4859-bb09-c6d33ccc8855 was created at2021-10-20 15:18:55.946114
+2021-10-20 15:18:56,650 - The status of Server:jwm3:00ec8d26-8c53-4859-bb09-c6d33ccc8855 is maintenance at 2021-10-20 15:18:56.650278
+2021-10-20 15:18:56,658 - 127.0.0.1 - - [20/Oct/2021 15:18:56] "[35m[1mPOST /server HTTP/1.1[0m" 500 -
+2021-10-20 15:19:19,122 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\Upcloud_API.py', reloading
+2021-10-20 15:19:19,938 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:19:19,947 -  * Debugger is active!
+2021-10-20 15:19:19,950 -  * Debugger PIN: 330-678-522
+2021-10-20 15:19:19,981 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 15:20:31,234 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\Cli.py', reloading
+2021-10-20 15:20:32,030 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:20:32,039 -  * Debugger is active!
+2021-10-20 15:20:32,041 -  * Debugger PIN: 330-678-522
+2021-10-20 15:20:32,072 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 15:20:34,409 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:20:37,190 - 127.0.0.1 - - [20/Oct/2021 15:20:37] "GET /server/00437603-fea5-40e0-92dd-a95d404a5e2c HTTP/1.1" 200 -
+2021-10-20 15:20:37,224 - Connected (version 2.0, client OpenSSH_8.4p1)
+2021-10-20 15:20:37,343 - Authentication (publickey) successful!
+2021-10-20 15:22:10,241 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\Cli.py', reloading
+2021-10-20 15:22:11,065 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:22:11,074 -  * Debugger is active!
+2021-10-20 15:22:11,077 -  * Debugger PIN: 330-678-522
+2021-10-20 15:22:11,106 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-10-20 15:26:09,429 -  * Detected change in 'C:\\Users\\lu\\PycharmProjects\\MS_TAP_UpCloud_API\\Upcloud_API.py', reloading
+2021-10-20 15:26:10,241 - A private_key.pem file is generated and stored for user: root.
+2021-10-20 15:26:10,250 -  * Debugger is active!
+2021-10-20 15:26:10,253 -  * Debugger PIN: 330-678-522
+2021-10-20 15:26:10,283 -  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
