@@ -8,23 +8,41 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 from datetime import datetime
 import logs
+import os
+import sys
 
-
-# class Logs:
-#     def __init__(self):
-#         logging.basicConfig(filename='app.log', level=logging.DEBUG, format='%(asctimes:%(levelname)s:%(message)s')
 
 class Upcloud_API:
     def __init__(self):
         self.mylogger = logs.Logs()
         self.manager = upcloud_api.CloudManager('tapaug2021ee', 'gr4D334uG2021')
         self.manager.authenticate()
-        self.login_user = self.key_pair_login()
+        if os.path.isfile('.\private_key.pem'):
+            self.get_login_user()
+        else:
+            self.login_user = self.key_pair_create()
         self.planList = ["1xCPU-2GB", "1xCPU-1GB", "2xCPU-4GB", "4xCPU-8GB", "6xCPU-16GB", "8xCPU-32GB", "12xCPU-48GB",
                          "16xCPU-64GB", "20xCPU-96GB", "20xCPU-128G"]
 
-    # login user
-    def key_pair_login(self):
+    # get public key from the existing private key
+    def get_login_user(self):
+        with open('.\private_key.pem','rb') as file:
+            private_key = serialization.load_pem_private_key(file.read(),None,default_backend())
+            public_key = private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption())
+            public_key = public_key.decode('utf-8')
+        file.close()
+        login_user = login_user_block(
+            username='root',
+            ssh_keys=[public_key],
+            create_password=False
+        )
+        return login_user
+
+    # create new key pair
+    def key_pair_create(self):
         private_key = rsa.generate_private_key(
             public_exponent=65537,
             key_size=2048,
@@ -74,16 +92,16 @@ class Upcloud_API:
         server = self.manager.create_server(server)
         server_uuid = server.to_dict()['uuid']
         server_name = server.to_dict()['hostname']
-        self.mylogger.info_logger(server_name + ' with uuid:' +server_uuid+' was created at' + str(datetime.now()))
-        self.server_status(server)
+        self.mylogger.info_logger(server_name + ' with uuid:' +server_uuid+' was created at ' + str(datetime.now()))
         return server
 
     # get current server status
     def server_status(self, uuid):
         server_status = self.manager.get_server(uuid).to_dict()['state']
         server_name = self.manager.get_server(uuid).to_dict()['hostname']
-        self.mylogger.info_logger('The status of Server:' + str(server_name) + ':' + str(uuid) +' is '+ str(server_status) + ' at '+str(datetime.now()))
-        return "Current status of server: " + str(server_name) + ":" + str(uuid) + "  is " + str(server_status)
+        self.mylogger.info_logger('The status of Server:' + server_name + ':' + uuid + ' is '+server_status + ' at '+str(datetime.now()))
+        return server_status
+ 
 
     def server_name(self,uuid):
         return self.manager.get_server(uuid).to_dict()['hostname']
@@ -94,6 +112,16 @@ class Upcloud_API:
             if i['access']=='public' and i['family']== 'IPv4':
                 return i['address']
 
+    def server_name(self, uuid):
+        return self.manager.get_server(uuid).to_dict()['hostname']
+
+    #get server ip
+    def server_ip(self, uuid):
+        for ip in self.manager.get_server(uuid).to_dict()['ip_addresses']:
+            if ip['access']=='public' and ip['family']== 'IPv4':
+                return ip['address']
+
+    # get all server list
     def server_list(self):
         servers = self.manager.get_servers()
         server_list = []
@@ -146,26 +174,37 @@ class Upcloud_API:
     def rm_server(self, uuid):
         try:
             self.manager.delete_server(uuid)
-            self.mylogger.info_logger('Server' +uuid + ' has been deleted.')
+            self.mylogger.info_logger('Server: ' +uuid + ' has been deleted.')
             return "SUCCESS"
         except Exception as e:
             return str(e)
 
-          
+
+    #check log of a specific server
+    def check_log(self,uuid):
+        with open("app.log",'r') as file:
+            lines = file.readlines()
+            server_log =[]
+            for line in lines:
+                if uuid in line:
+                    server_log.append(line)
+        return server_log
+
 if __name__ == '__main__':
-    # log = Logs()
     ins = Upcloud_API()
-    # login_user = ins.key_pair_login()
+    # ins.get_login_user()
+    # ins.check_log('0028ea76-cb26-43e7-9862-d89d164e2a6a')
     # print(ins.server_list())
     # print(ins.get_zones())
     # print(ins.get_templates())
     # print(ins.single_server('00effc4b-47f5-4394-a357-0750c810b096'))
     # print(ins.access_console('00effc4b-47f5-4394-a357-0750c810b096'))
     # print(ins.server_list())
-    print(ins.server_status('003f72ce-62b2-4f97-aba7-889b8bb483bf'))
-    # print(ins.perform_statistic_linux('00e3d773-a32e-4cea-9653-1df3543710fa'))
-    # print(ins.create_server("2xCPU-4GB","uk-lon1","maggie.win.com", "01000000-0000-4000-8000-000030200200", "10",login_user))
-    # ins.rm_server("0021e1da-be14-4440-8de6-f04b0650926b")
+    # print(ins.server_status('00adca12-fb12-4a54-9001-36cd2725aa4c'))
+    # print(ins.perform_statistic_linux('0028ea76-cb26-43e7-9862-d89d164e2a6a'))
+    # print(ins.create_server("2xCPU-4GB","uk-lon1","maggie.jmw.com", "01000000-0000-4000-8000-000030200200", "10"))
+    # print(ins.server_stop('00adca12-fb12-4a54-9001-36cd2725aa4c'))
+    print(ins.rm_server("00adca12-fb12-4a54-9001-36cd2725aa4c"))
 # get server details
 # print(self.manager.get_server("0021e1da-be14-4440-8de6-f04b0650926b").to_dict())
 # get server states
