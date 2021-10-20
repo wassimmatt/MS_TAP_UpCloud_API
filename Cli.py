@@ -347,7 +347,7 @@ class Cli:
                 print('VmEvents')
             elif (action == 'Exit'):
                 print('########EXITING PROGRAM THANKS##########')
-                break
+                exit()
             action = self.ask_action()
 
     def requestSummary(self, vmDetails, monitor):
