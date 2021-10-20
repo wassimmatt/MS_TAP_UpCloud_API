@@ -14,7 +14,8 @@ def create_server():
     json_data = request.get_json()
     print(json_data)
     server = json.loads(json_data)
-    new_server = api.create_server(server['plan'], server['zone'], server['hostname'], server['os'], int(server['size']))
+    new_server = api.create_server(server['plan'], server['zone'], server['hostname'], server['os'],
+                                   int(server['size']))
     new_server_dict = new_server.to_dict()
     return jsonify({
         "state": new_server_dict['state'],
@@ -35,12 +36,18 @@ def get_server_uuid(uuid):
     return jsonify(details)
 
 
-@app.route('/server/hostname/<hostname>', methods=['GET'])
-def get_server_hostname(hostname):
-    details = api.server_list()
-    for server in details:
-        if server['hostname'] == hostname:
-            return jsonify(server)
+@app.route('/server/status/<uuid>', methods=['GET'])
+def get_server_status(uuid):
+    status = api.server_status(uuid)
+    return status
+
+
+@app.route('/server/perf/<uuid>', methods=['GET'])
+def get_server_perf(uuid):
+    response = api.perform_statistic_linux(uuid)
+    print(response)
+    return jsonify(response)
+
 
 @app.route('/server/stop/<uuid>', methods=['DELETE'])
 def stop_server(uuid):
@@ -53,3 +60,20 @@ def stop_server(uuid):
 def delete_server(uuid):
     response = api.rm_server(uuid)
     return response
+
+
+@app.route('/zone', methods=['GET'])
+def get_zones():
+    response = api.get_zones()
+    return jsonify(response)
+
+
+@app.route('/plan', methods=['GET'])
+def get_plans():
+    return jsonify(api.planList)
+
+
+@app.route('/template', methods=['GET'])
+def get_templates():
+    response = api.get_templates()
+    return jsonify(response)

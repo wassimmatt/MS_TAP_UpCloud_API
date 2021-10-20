@@ -1,10 +1,14 @@
 from __future__ import print_function, unicode_literals
 
+import re
+import time
+
 import requests
 from PyInquirer import style_from_dict, Token, prompt, Separator
 import json
 from PyInquirer import prompt, Separator
 from Upcloud_API import Upcloud_API
+from shell import Shell
 
 # from requests import requests
 style = style_from_dict({
@@ -35,21 +39,25 @@ class Cli:
         return answers['action']
 
     def ask_zone(self):
+        response = requests.get(baseURL+'/zone')
+        zones = response.json()
         directions_prompt = {
             'type': 'list',
             'name': 'zone',
             'message': 'Which zone would you like to choose?',
-            'choices': self.manager.get_zones()
+            'choices': zones
         }
         answers = prompt(directions_prompt)
         return answers['zone']
 
     def ask_plan(self):
+        response = requests.get(baseURL + '/plan')
+        plans = response.json()
         directions_prompt = {
             'type': 'list',
             'name': 'plan',
             'message': 'Which plan would you like to choose?',
-            'choices': self.manager.planList
+            'choices': plans
         }
         answers = prompt(directions_prompt)
         return answers['plan']
@@ -102,7 +110,8 @@ class Cli:
         return vmDetails
 
     def get_os_dict(self):
-        mylist = self.manager.get_templates()
+        response = requests.get(baseURL+'/template')
+        mylist = response.json()
         all_keys = list(set().union(*(d.keys() for d in mylist)))
         all_values = list(set().union(*(d.values() for d in mylist)))
         d = dict(zip(all_keys, all_values))
@@ -110,7 +119,8 @@ class Cli:
 
     def get_all_servers_list(self):
         hostname_list = []
-        for i in self.manager.server_list():
+        response = requests.get(baseURL+'/server')
+        for i in response.json():
             hostname_list.append(i['hostname'] + ":" + i['uuid'])
 
         return hostname_list
@@ -173,13 +183,15 @@ class Cli:
             self.check_all_vms_status()
 
         elif answers['status_option'] == "get more details about a specific VM":
-            out = self.manager.single_server(self.get_delete_choice())
-            json_data = json.dumps(out, indent=4)
+            uuid = self.get_delete_choice()
+            response = requests.get(baseURL+'/server/'+uuid)
+            json_data = json.dumps(response.json(), indent=4)
             print(json_data)
 
     def check_all_vms_status(self):
-        for i in self.get_all_servers_list():
-            print(self.manager.server_status(i.split(':')[1]))
+        response = requests.get(baseURL+'/server')
+        for server in response.json():
+            print(server['hostname'] + ":" + server['uuid'] + ":" + server['state'])
 
     def after_create_info(self, uuid):
         response = requests.get(baseURL + '/server/' + uuid)
@@ -209,7 +221,7 @@ class Cli:
         if monitor == 'YES':
             while new_uuid_list:
                 for uuid in new_uuid_list:
-                    status = self.manager.server_status(uuid)
+                    status = self.get_server_status(uuid)
                     if status != 'maintenance':
                         print("Server " + str(count) + "/" + str(len(vm_list)) + ": " + status)
                         self.after_create_info(uuid)
@@ -221,8 +233,10 @@ class Cli:
         monitor = self.request_progress()
         requests.delete(baseURL + '/server/stop/' + uuid)
         if monitor == 'YES':
-            while self.manager.server_status(uuid) != 'stopped':
-                pass
+            while True:
+                status = self.get_server_status(uuid)
+                if status == 'stopped':
+                    break
             print("Server status: stopped")
         response = requests.delete(baseURL + '/server/' + uuid)
         if response.text == 'SUCCESS':
@@ -235,12 +249,52 @@ class Cli:
 
     def perfome_VmConsole(self):
         uuid = self.get_delete_choice()
-        ip = self.manager.server_ip(uuid)
+        response = requests.get(baseURL+'/server/'+uuid)
+        server_details = response.json()
+        for i in server_details['ip_addresses']:
+            if i['access']=='public' and i['family']== 'IPv4':
+                ip = i['address']
+        print("Connecting to the VM...")
+        sh = Shell(ip, 'root', 'private_key_save.pem')
+        # Print initial command line
+        while True:
+            if sh.channel.recv_ready():
+                output = sh.channel.recv(1024)
+                new_output = str(output.decode('utf-8'))
+                output_list = new_output.split('\n')
+                output_list.pop(0)
+                for count, line in enumerate(output_list):
+                    if count == len(output_list) - 1:
+                        print(line, end='')
+                    else:
+                        print(line)
+            else:
+                time.sleep(0.5)
+                if not (sh.channel.recv_ready()):
+                    break
+        while True:
+            try:
+                command = input()
+                if command == 'exit':
+                    break
+                stdout = sh.execute(command)
+                for count, line in enumerate(stdout):
+                    line = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -/]*[@-~]').sub('', line).replace('\b', '').replace('\r', '')
+                    if count == len(stdout) - 1:
+                        print(line, end='')
+                    else:
+                        print(line)
+            except KeyboardInterrupt:
+                break
+
         # add the manager component
 
     def perfome_checkPerformance(self):
         uuid = self.get_delete_choice()
-        self.manager.perform_statistic_linux(uuid)
+        response = requests.get(baseURL+'/server/perf/'+uuid)
+        perf_details = response.json()
+        for line in perf_details:
+            print(line.strip())
 
     def action(self):
         action = self.ask_action()
@@ -277,6 +331,10 @@ class Cli:
         print("\n\n\n")
         print("MONITORING CHOICE: ", monitor, "\n\n\n")
         return summary
+
+    def get_server_status(self, uuid):
+        response = requests.get(baseURL + '/server/status/' + uuid)
+        return response.text
 
     #
     #
@@ -344,4 +402,4 @@ class Cli:
 
 
 ins = Cli()
-ins.performe_deleteVm()
+ins.perfome_checkPerformance()
