@@ -35,7 +35,6 @@ class Upcloud_API:
                                                            serialization.PublicFormat.OpenSSH)
         public_key = public_key.decode(encoding='UTF-8')
         # get private key in PEM container format
-        public_key = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGRPNg31+bO29aLrXisdz2H4DxBn1xRdcX3lJ/2yMHgrm8AVSP/R7dYLJIGjymoUTfRrkEZ1PlSaDl5JCkJqwT23N2zP6DvLEH23ZX5V8PGe02GKJSngmP71KED1EiF4FVBIeu6+U4jwnr3vB+ghPTPqUx0TZFra+klYp/khXEAEfIp/+VLVyDvAfpjZugm6jGqFxUKmSHbLZq3A4WuAyjGiZMC8mMKkYPcOej4mCNCI2wfRkh2un4YU5rfxQAvj6WHfWxSQuXJzidhQeKQyz/GSjbmtusPohyU2GjvbN2uSOjoTcXGXdK3+RJq0YEHqGiGfM2FQBpM7x1hXwEVXVL'
         pem = private_key.private_bytes(encoding=serialization.Encoding.PEM,
                                         format=serialization.PrivateFormat.TraditionalOpenSSL,
                                         encryption_algorithm=serialization.NoEncryption())
@@ -45,8 +44,8 @@ class Upcloud_API:
             create_password=False
         )
         self.mylogger.info_logger('A private_key.pem file is generated and stored for user: root.')
-        # with open('private_key.pem', 'wb') as f:
-        #     f.write(pem)
+        with open('private_key.pem', 'wb') as f:
+            f.write(pem)
         return login_user
 
     def get_zones(self):
