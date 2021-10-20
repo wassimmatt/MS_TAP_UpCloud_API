@@ -42,9 +42,14 @@ def get_server_hostname(hostname):
         if server['hostname'] == hostname:
             return jsonify(server)
 
+@app.route('/server/stop/<uuid>', methods=['DELETE'])
+def stop_server(uuid):
+    api.stop_server(uuid)
+    return "Stopping server"
+
 
 # TODO: Proper response
 @app.route('/server/<uuid>', methods=['DELETE'])
 def delete_server(uuid):
-    api.rm_server(uuid)
-    return "Successfully deleted server"
+    response = api.rm_server(uuid)
+    return response

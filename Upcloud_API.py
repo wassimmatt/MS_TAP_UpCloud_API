@@ -166,18 +166,18 @@ class Upcloud_API:
         except Exception as e:
             raise e
 
+    def stop_server(self, uuid):
+        server = self.manager.get_server(uuid)
+        if server.to_dict()['state'] != 'stopped':
+            server.shutdown(hard=True)
 
     #delete a vm based on the uuid
     def rm_server(self,uuid):
         try:
-            server = self.manager.get_server(uuid)
-            server.shutdown(hard=True)
-            while self.manager.get_server(uuid).to_dict()["state"] != "stopped":
-                pass
             self.manager.delete_server(uuid)
-            return "Selected server has been deleted."
+            return "SUCCESS"
         except Exception as e:
-            raise e
+            return str(e)
 
 if __name__ == '__main__':
     ins = Upcloud_API()
