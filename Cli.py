@@ -166,21 +166,26 @@ class Cli:
             'type': 'list',
             'name': 'delete_option',
             'message': 'please pick a choice for the next step?',
-            'choices': ['choice from existing VMs list', 'enter VM UUID']
+            'choices': ['choice from existing VMs list','enter VM UUID','Return To the Main Menu','EXIT']
         }
         answers = prompt(directions_prompt)
-        if answers['delete_option'] == "choice from existing VMs list":
+        if  answers['delete_option'] == "choice from existing VMs list":
             return self.pick_vm().split(':')[1]
 
-        elif answers['delete_option'] == "enter VM UUID":
+        elif answers['delete_option'] =="enter VM UUID":
             return self.get_input('What\'s your VM uuid')
+        elif answers['delete_option'] == "Return To the Main Menu":
+            self.action()
+        elif answers['delete_option'] == "EXIT":
+            print('########EXITING PROGRAM THANKS##########')
+            exit()
 
     def get_checkStatus_choice(self):
         directions_prompt = {
             'type': 'list',
             'name': 'status_option',
             'message': 'please pick a choice for the next step?',
-            'choices': ['check all VMs status', 'get more details about a specific VM']
+            'choices': ['check all VMs status','get more details about a specific VM','Return To the Main Menu','EXIT']
         }
         answers = prompt(directions_prompt)
         if answers['status_option'] == "check all VMs status":
@@ -191,7 +196,12 @@ class Cli:
             response = requests.get(baseURL+'/server/'+uuid)
             json_data = json.dumps(response.json(), indent=4)
             print(json_data)
-
+        elif answers['status_option'] == "Return To the Main Menu":
+            self.action()
+        elif answers['delete_option'] == "EXIT":
+            print('########EXITING PROGRAM THANKS##########')
+            exit()
+            
     def check_all_vms_status(self):
         response = requests.get(baseURL+'/server')
         for server in response.json():
