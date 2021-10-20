@@ -78,12 +78,15 @@ class Upcloud_API:
         server_name = self.manager.get_server(uuid).to_dict()['hostname']
         return server_status
 
+    def server_name(self,uuid):
+        return self.manager.get_server(uuid).to_dict()['hostname']
+
     #get server ip
     def server_ip(self, uuid):
         for i in self.manager.get_server(uuid).to_dict()['ip_addresses']:
             if i['access']=='public' and i['family']== 'IPv4':
                 return i['address']
-   
+
     #get all server list
     def server_list(self):
         servers = self.manager.get_servers()
