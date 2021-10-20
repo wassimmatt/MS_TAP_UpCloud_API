@@ -33,7 +33,7 @@ class Cli:
             'type': 'list',
             'name': 'action',
             'message': 'Which action would you like to perform?',
-            'choices': ['CreateVM', 'CheckVmStatus', 'DeleteVm', 'VmConsole', 'PerformanceStat', 'VmEvents', 'Exit']
+            'choices': ['CreateVM', 'CheckVmStatus', 'DeleteVm', 'VmConsole', 'PerformanceStat', 'VmEvents']
         }
         answers = prompt(directions_prompt)
         return answers['action']
@@ -96,8 +96,25 @@ class Cli:
         }
         answers = prompt(directions_prompt)
         return answers['request_prog']
-
-    def get_vm_details(self):
+    def choice_confirm(self):
+        directions_prompt = {
+            'type': 'list',
+            'name': 'confirm_option',
+            'message': 'please confirm your options?',
+            'choices': ['Confirm','Choose again','Return To the Main Menu','EXIT']
+        }
+        answers = prompt(directions_prompt)
+        if answers['confirm_option'] == "Confirm":
+            print("options confirmed\n")
+        elif answers['confirm_option'] == "Choose again":
+            self.get_vm_details()
+        elif answers['confirm_option'] == "Return To the Main Menu":
+            self.action()
+        elif answers['delete_option'] == "EXIT":
+            print('########EXITING PROGRAM THANKS##########')
+            exit()
+            
+  def get_vm_details(self):
         vmDetails=[]
         zone = self.ask_zone()
         plan = self.ask_plan()
@@ -105,7 +122,7 @@ class Cli:
         os = self.get_os_dict()[os_name]
         os_size = self.get_os_storage()
         VmNumber = int(self.get_input('how many VMs you would like to create with these options:\n' +'zone :' +zone +'\n'+'plan: '+plan +'\n'+'os: '+os_name +'\n' ))
-
+        self.choice_confirm()
         count=1
         for i in range(0, VmNumber):
             vmName = self.get_input('Please pick a name for VM '+ str(count) +'/' +str(VmNumber))
@@ -244,18 +261,19 @@ class Cli:
 
     def performe_deleteVm(self):
         uuid = self.get_delete_choice()
-        print("Deleting VM...")
+        monitor = self.request_progress()
         requests.delete(baseURL + '/server/stop/' + uuid)
-        while True:
-            status = self.get_server_status(uuid)
-            if status == 'stopped':
-                break
-        print("Server status: stopped")
+        if monitor == 'YES':
+            while True:
+                status = self.get_server_status(uuid)
+                if status == 'stopped':
+                    break
+            print("Server status: stopped")
         response = requests.delete(baseURL + '/server/' + uuid)
         if response.text == 'SUCCESS':
             print("Server status (uuid: " + uuid + "): destroyed.")
         else:
-            print("Failed to destroy server (uuid: " + uuid + "): " + response.text)
+            print("Failed to destroy server (uuid: " + uuid + "): response.text")
 
     def performe_CheckVmStatus(self):
         self.get_checkStatus_choice()
@@ -268,7 +286,7 @@ class Cli:
             if i['access']=='public' and i['family']== 'IPv4':
                 ip = i['address']
         print("Connecting to the VM...")
-        sh = Shell(ip, 'root', 'private_key.pem')
+        sh = Shell(ip, 'root', 'private_key_save.pem')
         # Print initial command line
         while True:
             if sh.channel.recv_ready():
@@ -320,6 +338,7 @@ class Cli:
                 self.performe_CheckVmStatus()
             elif (action == 'DeleteVm'):
                 self.performe_deleteVm()
+                print(self.get_all_servers_list())
             elif (action == 'VmConsole'):
                 self.perfome_VmConsole()
             elif (action == 'PerformanceStat'):
@@ -421,4 +440,4 @@ class Cli:
 
 
 ins = Cli()
-ins.action()
+ins.perfome_VmConsole()
