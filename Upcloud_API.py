@@ -77,7 +77,7 @@ class Upcloud_API:
         templates = self.manager.get_templates()
         return templates
 
-
+    #new server creation
     def create_server(self, plan, zone, hostname, os, os_size):
         server = Server(
             plan=plan,
@@ -100,6 +100,18 @@ class Upcloud_API:
         server_name = self.manager.get_server(uuid).to_dict()['hostname']
         self.mylogger.info_logger('The status of Server:' + server_name + ':' + uuid + ' is '+server_status + ' at '+str(datetime.now()))
         return server_status
+        self.mylogger.info_logger('The status of Server:' + server_name + ':' + uuid+' is '+server_status + ' at '+str(datetime.now()))
+        return "Current status of server: " + server_name + ":" + uuid + "  is " + server_status
+
+    def server_name(self,uuid):
+        return self.manager.get_server(uuid).to_dict()['hostname']
+
+    #get server ip
+    def server_ip(self, uuid):
+        for i in self.manager.get_server(uuid).to_dict()['ip_addresses']:
+            if i['access']=='public' and i['family']== 'IPv4':
+                return i['address']
+
 
     def server_name(self, uuid):
         return self.manager.get_server(uuid).to_dict()['hostname']
@@ -162,6 +174,7 @@ class Upcloud_API:
         except Exception as e:
             return str(e)
 
+
     #check log of a specific server
     def check_log(self,uuid):
         with open("app.log",'r') as file:
@@ -171,7 +184,7 @@ class Upcloud_API:
                 if uuid in line:
                     server_log.append(line)
         return server_log
-8
+
 if __name__ == '__main__':
     ins = Upcloud_API()
     # ins.get_login_user()
