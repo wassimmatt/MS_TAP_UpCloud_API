@@ -33,7 +33,7 @@ class Cli:
             'type': 'list',
             'name': 'action',
             'message': 'Which action would you like to perform?',
-            'choices': ['CreateVM', 'CheckVmStatus', 'DeleteVm', 'VmConsole', 'PerformanceStat', 'VmEvents']
+            'choices': ['CreateVM', 'CheckVmStatus', 'DeleteVm', 'VmConsole', 'PerformanceStat', 'VmEvents', 'Exit']
         }
         answers = prompt(directions_prompt)
         return answers['action']
@@ -98,15 +98,19 @@ class Cli:
         return answers['request_prog']
 
     def get_vm_details(self):
-        vmDetails = []
-        VmNumber = int(self.get_input('how many VMs you would like to create'))
+        vmDetails=[]
+        zone = self.ask_zone()
+        plan = self.ask_plan()
+        os_name=self.ask_os()
+        os = self.get_os_dict()[os_name]
+        os_size = self.get_os_storage()
+        VmNumber = int(self.get_input('how many VMs you would like to create with these options:\n' +'zone :' +zone +'\n'+'plan: '+plan +'\n'+'os: '+os_name +'\n' ))
+
+        count=1
         for i in range(0, VmNumber):
-            vmName = self.get_input('What\'s your VM name')
-            zone = self.ask_zone()
-            plan = self.ask_plan()
-            os = self.get_os_dict()[self.ask_os()]
-            os_size = self.get_os_storage()
-            vmDetails.append([vmName, zone, os, plan, os_size])
+            vmName = self.get_input('Please pick a name for VM '+ str(count) +'/' +str(VmNumber))
+            vmDetails.append([vmName, zone, os, plan,os_size])
+            count=count+1
         return vmDetails
 
     def get_os_dict(self):
@@ -230,19 +234,18 @@ class Cli:
 
     def performe_deleteVm(self):
         uuid = self.get_delete_choice()
-        monitor = self.request_progress()
+        print("Deleting VM...")
         requests.delete(baseURL + '/server/stop/' + uuid)
-        if monitor == 'YES':
-            while True:
-                status = self.get_server_status(uuid)
-                if status == 'stopped':
-                    break
-            print("Server status: stopped")
+        while True:
+            status = self.get_server_status(uuid)
+            if status == 'stopped':
+                break
+        print("Server status: stopped")
         response = requests.delete(baseURL + '/server/' + uuid)
         if response.text == 'SUCCESS':
             print("Server status (uuid: " + uuid + "): destroyed.")
         else:
-            print("Failed to destroy server (uuid: " + uuid + "): response.text")
+            print("Failed to destroy server (uuid: " + uuid + "): " + response.text)
 
     def performe_CheckVmStatus(self):
         self.get_checkStatus_choice()
@@ -255,7 +258,7 @@ class Cli:
             if i['access']=='public' and i['family']== 'IPv4':
                 ip = i['address']
         print("Connecting to the VM...")
-        sh = Shell(ip, 'root', 'private_key_save.pem')
+        sh = Shell(ip, 'root', 'private_key.pem')
         # Print initial command line
         while True:
             if sh.channel.recv_ready():
@@ -298,20 +301,25 @@ class Cli:
             print(line.strip())
 
     def action(self):
+        print('#############WELCOME#############')
         action = self.ask_action()
-        if (action == 'CreateVM'):
-            self.performe_CreateVM()
-        elif (action == 'CheckVmStatus'):
-            self.performe_CheckVmStatus()
-        elif (action == 'DeleteVm'):
-            self.performe_deleteVm()
-            print(self.get_all_servers_list())
-        elif (action == 'VmConsole'):
-            self.perfome_VmConsole()
-        elif (action == 'PerformanceStat'):
-            self.perfome_checkPerformance()
-        elif (action == 'VmEvents'):
-            print('VmEvents')
+        while True:
+            if (action == 'CreateVM'):
+                self.performe_CreateVM()
+            elif (action == 'CheckVmStatus'):
+                self.performe_CheckVmStatus()
+            elif (action == 'DeleteVm'):
+                self.performe_deleteVm()
+            elif (action == 'VmConsole'):
+                self.perfome_VmConsole()
+            elif (action == 'PerformanceStat'):
+                self.perfome_checkPerformance()
+            elif (action == 'VmEvents'):
+                print('VmEvents')
+            elif (action == 'Exit'):
+                print('########EXITING PROGRAM THANKS##########')
+                break
+            action = self.ask_action()
 
     def requestSummary(self, vmDetails, monitor):
         print("..")
@@ -403,4 +411,4 @@ class Cli:
 
 
 ins = Cli()
-ins.perfome_VmConsole()
+ins.action()
